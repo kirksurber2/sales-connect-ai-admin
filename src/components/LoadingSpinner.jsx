@@ -1,11 +1,9 @@
-import ReactLoadingModule from 'react-loading';
-
-const ReactLoading = ReactLoadingModule.default || ReactLoadingModule;
+import { ClipLoader } from 'react-spinners';
 
 export default function LoadingSpinner() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
-      <ReactLoading type="spin" color="var(--accent)" height={36} width={36} />
+      <ClipLoader color="var(--accent)" size={36} />
     </div>
   );
 }
