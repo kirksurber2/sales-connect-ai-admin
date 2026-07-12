@@ -1,4 +1,6 @@
-import ReactLoading from 'react-loading';
+import ReactLoadingModule from 'react-loading';
+
+const ReactLoading = ReactLoadingModule.default || ReactLoadingModule;
 
 export default function LoadingSpinner() {
   return (
