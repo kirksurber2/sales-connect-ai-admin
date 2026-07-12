@@ -41,6 +41,7 @@ export function AuthProvider({ children }) {
   }
 
   async function login(email, password) {
+    try { await signOut(); } catch {}
     const result = await signIn({ username: email, password });
     if (result.isSignedIn) await checkAuth();
     return result;
