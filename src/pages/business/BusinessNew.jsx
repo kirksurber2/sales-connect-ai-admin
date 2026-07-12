@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { INDUSTRIES, SITES_TIERS, MAINTENANCE_TIERS, GOOGLE_FONTS, BUTTON_STYLES } from '../../utils/constants';
-import styles from './clients.module.css';
+import styles from './business.module.css';
 
 const emptyClient = {
   businessName: '', ownerName: '', industry: '', phone: '', email: '',
@@ -65,7 +65,7 @@ export default function ClientNew() {
     try {
       const businessId = form.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
       const payload = { ...form, businessId, createdAt: new Date().toISOString() };
-      await api.post('/clients', payload);
+      await api.post('/business', payload);
       setSuccess(businessId);
     } catch (err) {
       alert('Error saving: ' + err.message);
@@ -77,7 +77,7 @@ export default function ClientNew() {
   if (success) {
     return (
       <div className={styles.success}>
-        Client created successfully! <Link to={`/clients/${success}`}>View client →</Link>
+        Client created successfully! <Link to={`/business/${success}`}>View business →</Link>
       </div>
     );
   }

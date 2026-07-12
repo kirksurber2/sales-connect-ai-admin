@@ -10,7 +10,7 @@ export default function OrderNew() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.get('/clients').then(setClients).catch(() => {});
+    api.get('/business').then(setClients).catch(() => {});
   }, []);
 
   async function handleSubmit(e) {

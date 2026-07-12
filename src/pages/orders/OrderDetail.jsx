@@ -15,7 +15,7 @@ export default function OrderDetail() {
   useEffect(() => {
     api.get(`/orders/${orderId}`).then(o => {
       setOrder(o);
-      if (o.businessId) api.get(`/clients/${o.businessId}`).then(setClient).catch(() => {});
+      if (o.businessId) api.get(`/business/${o.businessId}`).then(setClient).catch(() => {});
     }).catch(() => {});
   }, [orderId]);
 

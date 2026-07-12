@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus, FiSearch } from 'react-icons/fi';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
-import styles from './clients.module.css';
+import styles from './business.module.css';
 
 export default function ClientList() {
   const [clients, setClients] = useState([]);
@@ -12,7 +12,7 @@ export default function ClientList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/clients').then(setClients).catch(() => setClients([]));
+    api.get('/business').then(setClients).catch(() => setClients([]));
   }, []);
 
   const filtered = clients.filter(c => {
@@ -25,7 +25,7 @@ export default function ClientList() {
     <div>
       <div className={styles.pageHeader}>
         <h1>Clients</h1>
-        <Link to="/clients/new" className={styles.addBtn}><FiPlus /> Add Client</Link>
+        <Link to="/business/new" className={styles.addBtn}><FiPlus /> Add Business</Link>
       </div>
 
       <div className={styles.filters}>
@@ -49,7 +49,7 @@ export default function ClientList() {
           <span>Created</span>
         </div>
         {filtered.map(c => (
-          <div key={c.businessId || c._id} className={styles.tableRow} onClick={() => navigate(`/clients/${c.businessId}`)}>
+          <div key={c.businessId || c._id} className={styles.tableRow} onClick={() => navigate(`/business/${c.businessId}`)}>
             <span className={styles.businessName}>{c.businessName}</span>
             <span className={styles.muted}>{c.industry}</span>
             <span><StatusBadge status={c.status} /></span>

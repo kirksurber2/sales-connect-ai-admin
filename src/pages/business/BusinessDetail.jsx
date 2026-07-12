@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import styles from './clients.module.css';
+import styles from './business.module.css';
 
 export default function ClientDetail() {
   const { businessId } = useParams();
@@ -12,7 +12,7 @@ export default function ClientDetail() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    api.get(`/clients/${businessId}`).then(setClient).catch(() => {});
+    api.get(`/business/${businessId}`).then(setClient).catch(() => {});
     api.get(`/orders?businessId=${businessId}`).then(setOrders).catch(() => {});
   }, [businessId]);
 
@@ -26,7 +26,7 @@ export default function ClientDetail() {
         <h1>{client.businessName}</h1>
         <StatusBadge status={client.status} />
         {client.industry && <span className={styles.muted}>{client.industry}</span>}
-        <Link to={`/clients/${businessId}/edit`} className={styles.editLink}>Edit</Link>
+        <Link to={`/business/${businessId}/edit`} className={styles.editLink}>Edit</Link>
       </div>
 
       <div className={styles.tabs}>

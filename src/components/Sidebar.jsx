@@ -4,7 +4,7 @@ import styles from './Sidebar.module.css';
 
 const links = [
   { to: '/dashboard', icon: FiHome, label: 'Dashboard' },
-  { to: '/clients', icon: FiUsers, label: 'Clients' },
+  { to: '/business', icon: FiUsers, label: 'Business' },
   { to: '/orders', icon: FiShoppingCart, label: 'Orders' },
   { to: '/tickets', icon: FiMessageSquare, label: 'Tickets' },
   { to: '/billing', icon: FiDollarSign, label: 'Billing' },

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../utils/api';
 import { INDUSTRIES, SITES_TIERS, MAINTENANCE_TIERS, GOOGLE_FONTS, BUTTON_STYLES } from '../../utils/constants';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import styles from './clients.module.css';
+import styles from './business.module.css';
 
 export default function ClientEdit() {
   const { businessId } = useParams();
@@ -12,7 +12,7 @@ export default function ClientEdit() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.get(`/clients/${businessId}`).then(setForm).catch(() => {});
+    api.get(`/business/${businessId}`).then(setForm).catch(() => {});
   }, [businessId]);
 
   if (!form) return <LoadingSpinner />;
@@ -40,8 +40,8 @@ export default function ClientEdit() {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put(`/clients/${businessId}`, { ...form, updatedAt: new Date().toISOString() });
-      navigate(`/clients/${businessId}`);
+      await api.put(`/business/${businessId}`, { ...form, updatedAt: new Date().toISOString() });
+      navigate(`/business/${businessId}`);
     } catch (err) {
       alert('Error: ' + err.message);
     } finally {

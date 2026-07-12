@@ -6,10 +6,10 @@ import Login from './auth/Login';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
-import ClientList from './pages/clients/ClientList';
-import ClientNew from './pages/clients/ClientNew';
-import ClientDetail from './pages/clients/ClientDetail';
-import ClientEdit from './pages/clients/ClientEdit';
+import BusinessList from './pages/business/BusinessList';
+import BusinessNew from './pages/business/BusinessNew';
+import BusinessDetail from './pages/business/BusinessDetail';
+import BusinessEdit from './pages/business/BusinessEdit';
 import OrderList from './pages/orders/OrderList';
 import OrderDetail from './pages/orders/OrderDetail';
 import OrderNew from './pages/orders/OrderNew';
@@ -45,10 +45,10 @@ export default function App() {
               <Layout>
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/clients" element={<ClientList />} />
-                  <Route path="/clients/new" element={<ClientNew />} />
-                  <Route path="/clients/:businessId" element={<ClientDetail />} />
-                  <Route path="/clients/:businessId/edit" element={<ClientEdit />} />
+                  <Route path="/business" element={<BusinessList />} />
+                  <Route path="/business/new" element={<BusinessNew />} />
+                  <Route path="/business/:businessId" element={<BusinessDetail />} />
+                  <Route path="/business/:businessId/edit" element={<BusinessEdit />} />
                   <Route path="/orders" element={<OrderList />} />
                   <Route path="/orders/new" element={<OrderNew />} />
                   <Route path="/orders/:orderId" element={<OrderDetail />} />

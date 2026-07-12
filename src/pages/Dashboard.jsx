@@ -13,7 +13,7 @@ export default function Dashboard() {
     async function load() {
       try {
         const [clients, orders, tickets] = await Promise.all([
-          api.get('/clients'),
+          api.get('/business'),
           api.get('/orders'),
           api.get('/tickets'),
         ]);
@@ -29,7 +29,7 @@ export default function Dashboard() {
   }, []);
 
   const cards = [
-    { label: 'Active Clients', value: stats.clients, icon: FiUsers, color: 'var(--accent)' },
+    { label: 'Active Businesses', value: stats.clients, icon: FiUsers, color: 'var(--accent)' },
     { label: 'Pending Orders', value: stats.orders, icon: FiShoppingCart, color: 'var(--warning)' },
     { label: 'Open Tickets', value: stats.tickets, icon: FiMessageSquare, color: 'var(--error)' },
     { label: 'MRR', value: `$${stats.mrr.toLocaleString()}`, icon: FiDollarSign, color: 'var(--success)' },
@@ -52,7 +52,7 @@ export default function Dashboard() {
       </div>
 
       <div className={styles.quickLinks}>
-        <Link to="/clients/new" className={styles.quickLink}><FiPlus /> New Client</Link>
+        <Link to="/business/new" className={styles.quickLink}><FiPlus /> New Business</Link>
         <Link to="/orders" className={styles.quickLink}><FiEye /> View Orders</Link>
         <Link to="/tickets" className={styles.quickLink}><FiMessageSquare /> Tickets</Link>
       </div>
