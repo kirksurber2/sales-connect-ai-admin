@@ -26,10 +26,10 @@ export function AuthProvider({ children }) {
     try {
       const currentUser = await getCurrentUser();
       const session = await fetchAuthSession();
-      const groups = session.tokens?.idToken?.payload['cognito:groups'] || [];
+      const role = session.tokens?.idToken?.payload['custom:role'] || '';
       const allowed = ['Business-Owner', 'Owner', 'Admin'];
-      if (groups.some(g => allowed.includes(g))) {
-        setUser({ ...currentUser, groups });
+      if (allowed.includes(role)) {
+        setUser({ ...currentUser, role });
       } else {
         setUser(null);
       }
@@ -45,11 +45,11 @@ export function AuthProvider({ children }) {
     const result = await signIn({ username: email, password });
     if (result.isSignedIn) {
       const session = await fetchAuthSession();
-      const groups = session.tokens?.idToken?.payload['cognito:groups'] || [];
+      const role = session.tokens?.idToken?.payload['custom:role'] || '';
       const allowed = ['Business-Owner', 'Owner', 'Admin'];
-      if (groups.some(g => allowed.includes(g))) {
+      if (allowed.includes(role)) {
         const currentUser = await getCurrentUser();
-        setUser({ ...currentUser, groups });
+        setUser({ ...currentUser, role });
       }
     }
     return result;
