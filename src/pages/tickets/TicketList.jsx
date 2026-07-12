@@ -2,16 +2,20 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './tickets.module.css';
 
 export default function TicketList() {
   const [tickets, setTickets] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/tickets').then(setTickets).catch(() => setTickets([]));
+    api.get('/tickets').then(setTickets).catch(() => setTickets([])).finally(() => setLoading(false));
   }, []);
+
+  if (loading) return <LoadingSpinner />;
 
   const filtered = tickets.filter(t => !statusFilter || t.status === statusFilter);
 

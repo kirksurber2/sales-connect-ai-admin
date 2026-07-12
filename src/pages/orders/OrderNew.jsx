@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './orders.module.css';
 
 export default function OrderNew() {
@@ -8,9 +10,10 @@ export default function OrderNew() {
   const [clients, setClients] = useState([]);
   const [form, setForm] = useState({ businessId: '', pageType: '', title: '', description: '', referenceLinks: '', priority: 'Normal', notes: '' });
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/business').then(setClients).catch(() => {});
+    api.get('/business').then(setClients).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   async function handleSubmit(e) {
@@ -19,13 +22,16 @@ export default function OrderNew() {
     try {
       const order = { ...form, status: 'Pending', createdAt: new Date().toISOString() };
       await api.post('/orders', order);
+      toast.success('Order created');
       navigate('/orders');
     } catch (err) {
-      alert('Error: ' + err.message);
+      // error toast handled by api.js
     } finally {
       setSaving(false);
     }
   }
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div>

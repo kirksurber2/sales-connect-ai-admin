@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 import Login from './auth/Login';
@@ -37,6 +39,7 @@ function Layout({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />

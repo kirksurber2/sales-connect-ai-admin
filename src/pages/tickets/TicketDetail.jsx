@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -19,6 +20,7 @@ export default function TicketDetail() {
     const updated = { ...ticket, status, ...(status === 'Resolved' ? { resolvedAt: new Date().toISOString() } : {}) };
     await api.put(`/tickets/${ticketId}`, updated);
     setTicket(updated);
+    toast.success(`Status updated to ${status}`);
   }
 
   async function sendReply() {
@@ -28,6 +30,7 @@ export default function TicketDetail() {
     await api.put(`/tickets/${ticketId}`, updated);
     setTicket(updated);
     setReply('');
+    toast.success('Reply sent');
   }
 
   if (!ticket) return <LoadingSpinner />;

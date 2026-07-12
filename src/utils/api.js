@@ -1,4 +1,5 @@
 import { fetchAuthSession } from '@aws-amplify/auth';
+import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_ADMIN_API;
 
@@ -15,7 +16,11 @@ async function getHeaders() {
 async function request(path, options = {}) {
   const headers = await getHeaders();
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
-  if (!res.ok) throw new Error(`API Error: ${res.status}`);
+  if (!res.ok) {
+    const msg = `API Error: ${res.status}`;
+    toast.error(msg);
+    throw new Error(msg);
+  }
   return res.json();
 }
 

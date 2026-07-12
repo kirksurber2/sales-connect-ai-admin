@@ -3,16 +3,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './orders.module.css';
 
 export default function OrderList() {
   const [orders, setOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/orders').then(setOrders).catch(() => setOrders([]));
+    api.get('/orders').then(setOrders).catch(() => setOrders([])).finally(() => setLoading(false));
   }, []);
+
+  if (loading) return <LoadingSpinner />;
 
   const filtered = orders.filter(o => !statusFilter || o.status === statusFilter);
 

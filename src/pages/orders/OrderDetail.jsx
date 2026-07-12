@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -24,6 +25,7 @@ export default function OrderDetail() {
     if (status === 'Complete') updated.completedAt = new Date().toISOString();
     await api.put(`/orders/${orderId}`, updated);
     setOrder(updated);
+    toast.success(`Status updated to ${status}`);
   }
 
   if (!order) return <LoadingSpinner />;

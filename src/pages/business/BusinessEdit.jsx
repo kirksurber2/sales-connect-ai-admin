@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 import { INDUSTRIES, SITES_TIERS, MAINTENANCE_TIERS, GOOGLE_FONTS, BUTTON_STYLES } from '../../utils/constants';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -41,9 +42,10 @@ export default function ClientEdit() {
     setSaving(true);
     try {
       await api.put(`/business/${businessId}`, { ...form, updatedAt: new Date().toISOString() });
+      toast.success('Changes saved');
       navigate(`/business/${businessId}`);
     } catch (err) {
-      alert('Error: ' + err.message);
+      // error toast handled by api.js
     } finally {
       setSaving(false);
     }

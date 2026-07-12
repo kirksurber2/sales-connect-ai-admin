@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { api } from '../../utils/api';
 import { INDUSTRIES, SITES_TIERS, MAINTENANCE_TIERS, GOOGLE_FONTS, BUTTON_STYLES } from '../../utils/constants';
 import styles from './business.module.css';
@@ -66,9 +67,10 @@ export default function ClientNew() {
       const businessId = form.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
       const payload = { ...form, businessId, createdAt: new Date().toISOString() };
       await api.post('/business', payload);
+      toast.success('Business created successfully');
       setSuccess(businessId);
     } catch (err) {
-      alert('Error saving: ' + err.message);
+      // error toast handled by api.js
     } finally {
       setSaving(false);
     }

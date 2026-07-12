@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { FiUsers, FiShoppingCart, FiMessageSquare, FiDollarSign, FiPlus, FiEye } from 'react-icons/fi';
 import { useAuth } from '../auth/AuthProvider';
 import { api } from '../utils/api';
+import LoadingSpinner from '../components/LoadingSpinner';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [stats, setStats] = useState({ clients: 0, orders: 0, tickets: 0, mrr: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -23,10 +25,13 @@ export default function Dashboard() {
           tickets: tickets.filter(t => t.status === 'Open').length,
           mrr: 0,
         });
-      } catch { /* mock data fallback */ }
+      } catch { /* handled by api.js toast */ }
+      setLoading(false);
     }
     load();
   }, []);
+
+  if (loading) return <LoadingSpinner />;
 
   const cards = [
     { label: 'Active Businesses', value: stats.clients, icon: FiUsers, color: 'var(--accent)' },

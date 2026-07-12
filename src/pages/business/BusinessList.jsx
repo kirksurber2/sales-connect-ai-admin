@@ -3,17 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus, FiSearch } from 'react-icons/fi';
 import { api } from '../../utils/api';
 import StatusBadge from '../../components/StatusBadge';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './business.module.css';
 
 export default function ClientList() {
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/business').then(setClients).catch(() => setClients([]));
+    api.get('/business').then(setClients).catch(() => setClients([])).finally(() => setLoading(false));
   }, []);
+
+  if (loading) return <LoadingSpinner />;
 
   const filtered = clients.filter(c => {
     if (search && !c.businessName.toLowerCase().includes(search.toLowerCase())) return false;
