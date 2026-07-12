@@ -43,7 +43,15 @@ export function AuthProvider({ children }) {
   async function login(email, password) {
     try { await signOut(); } catch {}
     const result = await signIn({ username: email, password });
-    if (result.isSignedIn) await checkAuth();
+    if (result.isSignedIn) {
+      const session = await fetchAuthSession();
+      const groups = session.tokens?.idToken?.payload['cognito:groups'] || [];
+      const allowed = ['Business-Owner', 'Owner', 'Admin'];
+      if (groups.some(g => allowed.includes(g))) {
+        const currentUser = await getCurrentUser();
+        setUser({ ...currentUser, groups });
+      }
+    }
     return result;
   }
 
