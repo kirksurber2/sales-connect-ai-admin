@@ -21,6 +21,7 @@ import Billing from './pages/billing/Billing';
 import Team from './pages/team/Team';
 import Templates from './pages/templates/Templates';
 import Sops from './pages/sops/Sops';
+import SiteBuilder from './pages/sites/SiteBuilder';
 import styles from './App.module.css';
 
 function Layout({ children }) {
@@ -61,6 +62,7 @@ export default function App() {
                   <Route path="/team" element={<Team />} />
                   <Route path="/templates" element={<Templates />} />
                   <Route path="/sops" element={<Sops />} />
+                  <Route path="/sites/build" element={<SiteBuilder />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>
