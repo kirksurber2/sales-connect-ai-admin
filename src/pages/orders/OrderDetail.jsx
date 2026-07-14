@@ -14,7 +14,7 @@ export default function OrderDetail() {
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
-    api.get(`/orders/${orderId}`).then(o => {
+    api.get(`/site-orders/${orderId}`).then(o => {
       setOrder(o);
       if (o.businessId) api.get(`/business/${o.businessId}`).then(setClient).catch(() => {});
     }).catch(() => {});
@@ -23,7 +23,7 @@ export default function OrderDetail() {
   async function updateStatus(status) {
     const updated = { ...order, status };
     if (status === 'Complete') updated.completedAt = new Date().toISOString();
-    await api.put(`/orders/${orderId}`, updated);
+    await api.put(`/site-orders/${orderId}`, updated);
     setOrder(updated);
     toast.success(`Status updated to ${status}`);
   }

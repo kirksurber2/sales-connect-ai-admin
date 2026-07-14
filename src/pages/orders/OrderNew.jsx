@@ -21,7 +21,7 @@ export default function OrderNew() {
     setSaving(true);
     try {
       const order = { ...form, status: 'Pending', createdAt: new Date().toISOString() };
-      await api.post('/orders', order);
+      await api.post('/site-orders', order);
       toast.success('Order created');
       navigate('/orders');
     } catch (err) {

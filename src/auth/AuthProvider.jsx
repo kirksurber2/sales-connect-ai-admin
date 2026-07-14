@@ -26,10 +26,11 @@ export function AuthProvider({ children }) {
     try {
       const currentUser = await getCurrentUser();
       const session = await fetchAuthSession();
-      const role = session.tokens?.idToken?.payload['custom:role'] || '';
+      const payload = session.tokens?.idToken?.payload || {};
+      const role = payload['custom:role'] || '';
       const allowed = ['Business-Owner', 'Owner', 'Admin'];
       if (allowed.includes(role)) {
-        setUser({ ...currentUser, role });
+        setUser({ ...currentUser, role, name: payload.given_name || '' });
       } else {
         setUser(null);
       }
@@ -45,11 +46,12 @@ export function AuthProvider({ children }) {
     const result = await signIn({ username: email, password });
     if (result.isSignedIn) {
       const session = await fetchAuthSession();
-      const role = session.tokens?.idToken?.payload['custom:role'] || '';
+      const payload = session.tokens?.idToken?.payload || {};
+      const role = payload['custom:role'] || '';
       const allowed = ['Business-Owner', 'Owner', 'Admin'];
       if (allowed.includes(role)) {
         const currentUser = await getCurrentUser();
-        setUser({ ...currentUser, role });
+        setUser({ ...currentUser, role, name: payload.given_name || '' });
       }
     }
     return result;
