@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { FiCopy, FiPlus, FiTrash2, FiRefreshCw } from 'react-icons/fi';
+import { FiCopy, FiPlus, FiTrash2, FiRefreshCw, FiLayers } from 'react-icons/fi';
 import { INDUSTRIES, GOOGLE_FONTS, BUTTON_STYLES } from '../../utils/constants';
 import { generatePrompt } from './promptTemplate';
 import { api } from '../../utils/api';
@@ -30,7 +30,7 @@ const defaultForm = {
   businessName: '', tagline: '', industry: '', ownerName: '', ownerTitle: 'Owner',
   phone: '', email: '', address: '', serviceArea: '', yearsInBusiness: '',
   gbpUrl: '', domain: '', currentWebsite: '',
-  seoKeywords: '', seoSecondary: '',
+  seoKeywords: '', seoSecondary: '', seoLocalModifiers: '',
   primaryColor: '#1e3a5f', secondaryColor: '#f59e0b', accentColor: '#ffffff',
   bgDark: '#0f172a', bgLight: '#f8fafc', textPrimary: '#1e293b', textSecondary: '#64748b',
   fontHeading: 'Inter', fontBody: 'Inter', fontWeightHeading: '800', fontWeightBody: '400',
@@ -57,10 +57,54 @@ export default function SiteBuilder() {
   const [prompt, setPrompt] = useState('');
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
+  const [sitePrompt, setSitePrompt] = useState(null);
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
 
   useEffect(() => {
     api.get('/business').then(setClients).catch(() => {});
+    api.get('/prompt-templates?active=true').then(setTemplates).catch(() => {});
   }, []);
+
+  function applyTemplate(id) {
+    setSelectedTemplate(id);
+    if (!id) return;
+    const tpl = templates.find(t => t._id === id);
+    if (!tpl) return;
+    setForm(f => ({
+      ...f,
+      primaryColor: tpl.styleGuide?.primaryColor || f.primaryColor,
+      secondaryColor: tpl.styleGuide?.secondaryColor || f.secondaryColor,
+      accentColor: tpl.styleGuide?.accentColor || f.accentColor,
+      bgDark: tpl.styleGuide?.bgDark || f.bgDark,
+      bgLight: tpl.styleGuide?.bgLight || f.bgLight,
+      fontHeading: tpl.styleGuide?.fontHeading || f.fontHeading,
+      fontBody: tpl.styleGuide?.fontBody || f.fontBody,
+      buttonStyle: tpl.styleGuide?.buttonStyle || f.buttonStyle,
+      borderRadiusCards: tpl.styleGuide?.borderRadiusCards || f.borderRadiusCards,
+      borderRadiusButtons: tpl.styleGuide?.borderRadiusButtons || f.borderRadiusButtons,
+      seoKeywords: tpl.seo?.primaryKeyword || f.seoKeywords,
+      seoSecondary: (tpl.seo?.secondaryKeywords || []).join(', ') || f.seoSecondary,
+      seoLocalModifiers: (tpl.seo?.localModifiers || []).join(', ') || f.seoLocalModifiers,
+      voice: tpl.copyVoice?.voice || f.voice,
+      avoid: tpl.copyVoice?.avoid || f.avoid,
+      emphasize: tpl.copyVoice?.emphasize || f.emphasize,
+      ctaStyle: tpl.copyVoice?.ctaStyle || f.ctaStyle,
+      services: tpl.services?.length ? tpl.services : f.services,
+      whyChooseUs: tpl.whyChooseUs?.length ? tpl.whyChooseUs : f.whyChooseUs,
+      faqs: tpl.faqs?.length ? tpl.faqs : f.faqs,
+      galleryPage: tpl.pages?.galleryPage ?? f.galleryPage,
+      faqPage: tpl.pages?.faqPage ?? f.faqPage,
+      reviewsPage: tpl.pages?.reviewsPage ?? f.reviewsPage,
+      financingPage: tpl.pages?.financingPage ?? f.financingPage,
+      serviceAreaPage: tpl.pages?.serviceAreaPage ?? f.serviceAreaPage,
+      ctaButton1: tpl.hero?.ctaButton1 || f.ctaButton1,
+      ctaButton2: tpl.hero?.ctaButton2 || f.ctaButton2,
+      heroBackground: tpl.hero?.heroBackground || f.heroBackground,
+      aiInstructions: tpl.aiInstructions || '',
+    }));
+    toast.success(`Template "${tpl.name}" applied`);
+  }
 
   function set(key, val) { setForm(f => ({ ...f, [key]: val })); }
 
@@ -79,6 +123,24 @@ export default function SiteBuilder() {
       domain: c.domain || '',
       currentWebsite: c.website || '',
     }));
+    // Auto-apply matching industry template if none selected
+    if (!selectedTemplate && c.industry) {
+      const match = templates.find(t => t.industry === c.industry);
+      if (match) applyTemplate(match._id);
+    }
+    // Load SitePrompt SEO data for this client
+    api.get('/site-prompts?businessId=' + id).then(prompts => {
+      const sp = Array.isArray(prompts) ? prompts[0] : prompts;
+      if (sp?.seo) {
+        setSitePrompt(sp);
+        setForm(f => ({
+          ...f,
+          seoKeywords: sp.seo.primaryKeyword || f.seoKeywords,
+          seoSecondary: (sp.seo.secondaryKeywords || []).join(', ') || f.seoSecondary,
+          seoLocalModifiers: (sp.seo.localModifiers || []).join(', '),
+        }));
+      }
+    }).catch(() => {});
   }
 
   function applyColorPreset(preset) {
@@ -111,9 +173,49 @@ export default function SiteBuilder() {
   }
 
   function handleGenerate() {
-    const output = generatePrompt(form);
-    setPrompt(output);
+    // If a template with rawPrompt is selected, merge client data into it
+    const tpl = templates.find(t => t._id === selectedTemplate);
+    if (tpl?.rawPrompt) {
+      const merged = mergeRawPrompt(tpl.rawPrompt, form);
+      setPrompt(merged);
+    } else {
+      const output = generatePrompt(form);
+      setPrompt(output);
+    }
     toast.success('Prompt generated!');
+  }
+
+  function mergeRawPrompt(raw, data) {
+    const replacements = {
+      '[Business Name]': data.businessName,
+      '[Tagline]': data.tagline,
+      '[Industry]': data.industry,
+      '[Owner Name]': data.ownerName,
+      '[Phone]': data.phone,
+      '[Email]': data.email,
+      '[Address]': data.address,
+      '[Service Area]': data.serviceArea,
+      '[Years]': data.yearsInBusiness,
+      '[Domain]': data.domain,
+      '[GBP URL]': data.gbpUrl,
+      '[Primary Keyword]': data.seoKeywords,
+      '[Secondary Keywords]': data.seoSecondary,
+      '[Local Modifiers]': data.seoLocalModifiers,
+      '[Primary Color]': data.primaryColor,
+      '[Secondary Color]': data.secondaryColor,
+      '[Font Heading]': data.fontHeading,
+      '[Font Body]': data.fontBody,
+      '[CTA Button 1]': data.ctaButton1,
+      '[CTA Button 2]': data.ctaButton2,
+      '[Voice]': data.voice,
+      '[Avoid]': data.avoid,
+      '[Emphasize]': data.emphasize,
+    };
+    let result = raw;
+    for (const [placeholder, value] of Object.entries(replacements)) {
+      if (value) result = result.replaceAll(placeholder, value);
+    }
+    return result;
   }
 
   function handleCopy() {
@@ -128,13 +230,41 @@ export default function SiteBuilder() {
         <button className={styles.generateBtn} onClick={handleGenerate}><FiRefreshCw size={16} /> Generate Prompt</button>
       </div>
 
-      {/* Client Select */}
+      {/* Step 1: Template + Client Select */}
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Load from Client</h2>
-        <select className={styles.input} value={selectedClient} onChange={e => loadClient(e.target.value)}>
-          <option value="">Select existing client...</option>
-          {clients.map(c => <option key={c.businessId} value={c.businessId}>{c.businessName}</option>)}
-        </select>
+        <h2 className={styles.sectionTitle}><FiLayers size={16} /> Step 1: Select Base Prompt</h2>
+        <p className={styles.stepHint}>Choose an industry template as the foundation. Then optionally load a client to fill in their details.</p>
+        <div className={styles.grid}>
+          <div className={styles.field}>
+            <label className={styles.label}>Industry Template *</label>
+            <select className={styles.input} value={selectedTemplate} onChange={e => applyTemplate(e.target.value)}>
+              <option value="">Select template...</option>
+              {Object.entries(templates.reduce((acc, t) => { (acc[t.industry] = acc[t.industry] || []).push(t); return acc; }, {})).map(([industry, tpls]) => (
+                <optgroup key={industry} label={industry}>
+                  {tpls.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Load Client Data (optional)</label>
+            <select className={styles.input} value={selectedClient} onChange={e => loadClient(e.target.value)}>
+              <option value="">Select existing client...</option>
+              {clients.map(c => <option key={c.businessId} value={c.businessId}>{c.businessName}{c.industry ? ` (${c.industry})` : ''}</option>)}
+            </select>
+          </div>
+        </div>
+        {selectedTemplate && (
+          <div className={styles.templateApplied}>
+            ✓ Base prompt loaded. Fill in the details below to complete it.
+          </div>
+        )}
+      </div>
+
+      {/* Step 2: Client Details */}
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Step 2: Client Details</h2>
+        <p className={styles.stepHint}>Fill in the client-specific information. These values replace placeholders in the base prompt.</p>
       </div>
 
       {/* Business Info */}
@@ -165,9 +295,22 @@ export default function SiteBuilder() {
       {/* SEO */}
       <div className={styles.section}>
         <h2 className={styles.sectionTitle}>SEO Keywords</h2>
+        {sitePrompt?.seo?.keywords?.length > 0 && (
+          <div className={styles.keywordTracker}>
+            <label className={styles.label}>Keyword Tracker</label>
+            <div className={styles.keywordTags}>
+              {sitePrompt.seo.keywords.map((kw, i) => (
+                <span key={i} className={`${styles.keywordTag} ${styles['kw_' + kw.status.replace(/\s/g, '')]}`}>
+                  {kw.term} <small>({kw.status})</small>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         <div className={styles.grid}>
-          <Field label="Primary Keywords" value={form.seoKeywords} onChange={v => set('seoKeywords', v)} full placeholder="roofing houston, roof repair near me" />
-          <Field label="Secondary Keywords" value={form.seoSecondary} onChange={v => set('seoSecondary', v)} full placeholder="storm damage repair, gutter installation" />
+          <Field label="Primary Keyword" value={form.seoKeywords} onChange={v => set('seoKeywords', v)} full placeholder="roofing houston" />
+          <Field label="Secondary Keywords (comma-separated)" value={form.seoSecondary} onChange={v => set('seoSecondary', v)} full placeholder="storm damage repair, gutter installation" />
+          <Field label="Local Modifiers (comma-separated)" value={form.seoLocalModifiers} onChange={v => set('seoLocalModifiers', v)} full placeholder="houston, katy, sugar land, the woodlands" />
         </div>
       </div>
 
@@ -360,16 +503,21 @@ export default function SiteBuilder() {
         </div>
       </div>
 
-      {/* Generate */}
-      <div className={styles.actions}>
-        <button className={styles.generateBtn} onClick={handleGenerate}><FiRefreshCw size={16} /> Generate Prompt</button>
+      {/* Step 3: Generate + Copy */}
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Step 3: Generate & Copy</h2>
+        <p className={styles.stepHint}>Generate the final prompt with all your data merged in, then copy it to use in VS Code.</p>
+        <div className={styles.actions}>
+          <button className={styles.generateBtn} onClick={handleGenerate}><FiRefreshCw size={16} /> Generate Prompt</button>
+          {prompt && <button className={styles.copyBtn} onClick={handleCopy}><FiCopy size={14} /> Copy to Clipboard</button>}
+        </div>
       </div>
 
       {/* Output */}
       {prompt && (
         <div className={styles.section}>
           <div className={styles.outputHeader}>
-            <h2 className={styles.sectionTitle}>Generated Prompt</h2>
+            <h2 className={styles.sectionTitle}>Final Prompt</h2>
             <button className={styles.copyBtn} onClick={handleCopy}><FiCopy size={14} /> Copy</button>
           </div>
           <pre className={styles.output}>{prompt}</pre>

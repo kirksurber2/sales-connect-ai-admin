@@ -22,6 +22,8 @@ import Team from './pages/team/Team';
 import Templates from './pages/templates/Templates';
 import Sops from './pages/sops/Sops';
 import SiteBuilder from './pages/sites/SiteBuilder';
+import Keywords from './pages/sites/Keywords';
+import PromptTemplates from './pages/sites/PromptTemplates';
 import styles from './App.module.css';
 
 function Layout({ children }) {
@@ -63,6 +65,8 @@ export default function App() {
                   <Route path="/templates" element={<Templates />} />
                   <Route path="/sops" element={<Sops />} />
                   <Route path="/sites/build" element={<SiteBuilder />} />
+                  <Route path="/sites/keywords" element={<Keywords />} />
+                  <Route path="/sites/templates" element={<PromptTemplates />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>
