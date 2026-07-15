@@ -219,3 +219,53 @@
   .grid { grid-template-columns: 1fr; }
   .pageHeader { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
 }
+
+.keywordTracker { margin-bottom: 1rem; }
+
+.keywordTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.keywordTag {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.keywordTag small { opacity: 0.7; margin-left: 0.25rem; }
+
+.kw_Targeted { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.kw_Ranking { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.kw_NeedsContent { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.kw_Opportunity { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+.kw_Won { border-color: #06d6a0; background: rgba(6, 214, 160, 0.15); }
+
+.templateHint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+.templateApplied {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #10b981;
+}
+
+.stepHint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}

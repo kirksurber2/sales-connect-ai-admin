@@ -13,7 +13,7 @@ export default function OrderList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/orders').then(setOrders).catch(() => setOrders([])).finally(() => setLoading(false));
+    api.get('/site-orders').then(setOrders).catch(() => setOrders([])).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <LoadingSpinner />;

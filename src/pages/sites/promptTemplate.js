@@ -60,8 +60,15 @@ Current Website: ${data.currentWebsite || '[None]'}
 ## SEO KEYWORDS
 
 \`\`\`
-Primary Keywords: ${data.seoKeywords || '[e.g., "roofing houston", "roof repair near me"]'}
+Primary Keyword: ${data.seoKeywords || '[e.g., "roofing houston"]'}
 Secondary Keywords: ${data.seoSecondary || '[e.g., "storm damage repair", "gutter installation houston"]'}
+Local Modifiers: ${data.seoLocalModifiers || '[e.g., "houston", "katy", "sugar land"]'}
+
+SEO Instructions:
+- Use the primary keyword in the H1, meta title, first paragraph, and at least 2 H2s
+- Sprinkle secondary keywords naturally throughout service descriptions and headings
+- Combine primary keyword + local modifiers for location-specific pages (e.g., "roofing katy")
+- Include local modifiers in meta descriptions, schema markup, and footer
 \`\`\`
 
 ---
@@ -203,5 +210,14 @@ Meta Tags: unique title + description per page
 Open Graph: per page
 Canonical URLs: per page
 \`\`\`
+${data.aiInstructions ? `
+---
+
+## ADDITIONAL INSTRUCTIONS
+
+\`\`\`
+${data.aiInstructions}
+\`\`\`
+` : ''}
 `;
 }

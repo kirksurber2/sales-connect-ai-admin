@@ -139,3 +139,30 @@
   composes: input;
   width: auto;
 }
+
+.kwHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.kwHeader .sectionTitle { margin-bottom: 0; }
+
+.kwEditBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--accent);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.kwEditBtn:hover { border-color: var(--accent); }
+
+.kwHint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}

@@ -16,7 +16,7 @@ export default function Dashboard() {
       try {
         const [clients, orders, tickets] = await Promise.all([
           api.get('/business'),
-          api.get('/orders'),
+          api.get('/site-orders'),
           api.get('/tickets'),
         ]);
         setStats({
@@ -42,7 +42,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className={styles.greeting}>Welcome back, {user?.signInDetails?.loginId?.split('@')[0] || 'Admin'}</h1>
+      <h1 className={styles.greeting}>Welcome back, {user?.name || 'Admin'}</h1>
 
       <div className={styles.statsGrid}>
         {cards.map(({ label, value, icon: Icon, color }) => (

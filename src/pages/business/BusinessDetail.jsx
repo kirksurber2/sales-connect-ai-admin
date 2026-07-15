@@ -13,7 +13,7 @@ export default function ClientDetail() {
 
   useEffect(() => {
     api.get(`/business/${businessId}`).then(setClient).catch(() => {});
-    api.get(`/orders?businessId=${businessId}`).then(setOrders).catch(() => {});
+    api.get(`/site-orders?businessId=${businessId}`).then(setOrders).catch(() => {});
   }, [businessId]);
 
   if (!client) return <LoadingSpinner />;
