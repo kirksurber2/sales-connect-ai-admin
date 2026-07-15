@@ -1,8 +1,8 @@
 export const INDUSTRIES = [
-  'Roofer', 'HVAC', 'Plumber', 'Electrician', 'Landscaper', 'Pressure Washer',
+  'Housing Services','Roofer', 'HVAC', 'Plumber', 'Electrician', 'Landscaper', 'Pressure Washer',
   'Painter', 'Fencing', 'Concrete', 'General Contractor', 'Dentist', 'Chiropractor',
   'Med Spa', 'Auto Shop', 'Salon', 'Gym', 'Law Firm', 'Accountant',
-  'Real Estate Agent', 'Consultant', 'Other'
+  'Real Estate Agent', 'Consultant', 'Faceless / Top of Funnel','Other'
 ];
 
 export const CLIENT_STATUSES = ['Active', 'Onboarding', 'Churned'];

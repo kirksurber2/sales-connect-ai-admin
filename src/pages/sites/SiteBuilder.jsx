@@ -55,30 +55,59 @@ const defaultForm = {
 export default function SiteBuilder() {
   const [form, setForm] = useState(defaultForm);
   const [prompt, setPrompt] = useState('');
-  const [clients, setClients] = useState([]);
-  const [selectedClient, setSelectedClient] = useState('');
+  const [businesses, setBusinesses] = useState([]);
+  const [selectedBusiness, setSelectedBusiness] = useState('');
 
   useEffect(() => {
-    api.get('/business').then(setClients).catch(() => {});
+    api.get('/business').then(setBusinesses).catch(() => {});
   }, []);
 
   function set(key, val) { setForm(f => ({ ...f, [key]: val })); }
 
-  function loadClient(id) {
-    setSelectedClient(id);
-    const c = clients.find(cl => cl.businessId === id);
-    if (!c) return;
-    setForm(f => ({
-      ...f,
-      businessName: c.businessName || '',
-      industry: c.industry || '',
-      ownerName: c.ownerName || '',
-      phone: c.phone || '',
-      email: c.email || '',
-      address: c.address || '',
-      domain: c.domain || '',
-      currentWebsite: c.website || '',
-    }));
+  function loadBusiness(id) {
+    setSelectedBusiness(id);
+    if (!id) return;
+    api.get(`/business/${id}`).then(b => {
+      if (!b) return;
+      const sg = b.styleGuide || {};
+      setForm(f => ({
+        ...f,
+        businessName: b.businessName || '',
+        tagline: b.tagline || '',
+        industry: b.industry || '',
+        ownerName: b.ownerName || '',
+        phone: b.phone || '',
+        email: b.email || '',
+        address: b.address || '',
+        serviceArea: b.serviceArea || '',
+        yearsInBusiness: b.yearsInBusiness || '',
+        domain: b.domain || '',
+        currentWebsite: b.website || '',
+        gbpUrl: b.gbpUrl || '',
+        seoKeywords: b.seoKeywords || '',
+        seoSecondary: b.seoSecondary || '',
+        primaryColor: sg.primaryColor || f.primaryColor,
+        secondaryColor: sg.secondaryColor || f.secondaryColor,
+        accentColor: sg.accentColor || f.accentColor,
+        bgDark: sg.bgDark || f.bgDark,
+        bgLight: sg.bgLight || f.bgLight,
+        textPrimary: sg.textPrimary || f.textPrimary,
+        textSecondary: sg.textSecondary || f.textSecondary,
+        fontHeading: sg.fontHeading || f.fontHeading,
+        fontBody: sg.fontBody || f.fontBody,
+        buttonStyle: sg.buttonStyle || f.buttonStyle,
+        borderRadiusCards: sg.borderRadiusCards || f.borderRadiusCards,
+        borderRadiusButtons: sg.borderRadiusButtons || f.borderRadiusButtons,
+        services: b.services?.length ? b.services.map(s => ({ name: s.name || '', description: s.description || '', bullets: s.bullets || '' })) : f.services,
+        certifications: b.certifications || '',
+        voice: b.copyVoice?.brandVoice || '',
+        avoid: b.copyVoice?.wordsToAvoid || '',
+        emphasize: b.copyVoice?.keySellingPoints || '',
+        companyStory: b.companyStory || '',
+        hours: b.hours || f.hours,
+        googleMapsEmbed: b.googleMapsEmbed || '',
+      }));
+    }).catch(() => {});
   }
 
   function applyColorPreset(preset) {
@@ -128,12 +157,12 @@ export default function SiteBuilder() {
         <button className={styles.generateBtn} onClick={handleGenerate}><FiRefreshCw size={16} /> Generate Prompt</button>
       </div>
 
-      {/* Client Select */}
+      {/* Business Select */}
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Load from Client</h2>
-        <select className={styles.input} value={selectedClient} onChange={e => loadClient(e.target.value)}>
-          <option value="">Select existing client...</option>
-          {clients.map(c => <option key={c.businessId} value={c.businessId}>{c.businessName}</option>)}
+        <h2 className={styles.sectionTitle}>Load from Business</h2>
+        <select className={styles.input} value={selectedBusiness} onChange={e => loadBusiness(e.target.value)}>
+          <option value="">Select business...</option>
+          {businesses.map(b => <option key={b.businessId} value={b.businessId}>{b.businessName}</option>)}
         </select>
       </div>
 
