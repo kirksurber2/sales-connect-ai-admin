@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import { FiUpload, FiCopy, FiTrash2, FiVideo } from 'react-icons/fi';
+import { FiUpload, FiCopy, FiTrash2, FiVideo, FiUserPlus } from 'react-icons/fi';
 import { api } from '../../utils/api';
-import { fetchAuthSession } from '@aws-amplify/auth';
+import { INDUSTRIES } from '../../utils/constants';
 import styles from './audits.module.css';
 
-const S3_BUCKET = import.meta.env.VITE_AUDIT_S3_BUCKET;
-const S3_REGION = import.meta.env.VITE_AUDIT_S3_REGION || 'us-east-1';
 const VIEWER_BASE = import.meta.env.VITE_AUDIT_VIEWER_URL || window.location.origin;
+
+const emptyLead = { businessName: '', ownerName: '', phone: '', email: '', industry: '', website: '' };
 
 export default function AuditList() {
   const [audits, setAudits] = useState([]);
@@ -19,6 +19,9 @@ export default function AuditList() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [title, setTitle] = useState('');
+  const [showNewLead, setShowNewLead] = useState(false);
+  const [newLead, setNewLead] = useState(emptyLead);
+  const [savingLead, setSavingLead] = useState(false);
   const fileRef = useRef();
 
   useEffect(() => {
@@ -91,6 +94,28 @@ export default function AuditList() {
     }
   }
 
+  async function handleCreateLead(e) {
+    e.preventDefault();
+    if (!newLead.businessName || !newLead.phone) {
+      toast.error('Business name and phone are required');
+      return;
+    }
+    setSavingLead(true);
+    try {
+      const lead = await api.post('/leads', newLead);
+      setLeads(prev => [lead, ...prev]);
+      setSourceType('lead');
+      setSelectedId(lead._id || lead.leadId);
+      setNewLead(emptyLead);
+      setShowNewLead(false);
+      toast.success('Lead created!');
+    } catch {
+      // handled by api.js
+    } finally {
+      setSavingLead(false);
+    }
+  }
+
   function getViewerUrl(audit) {
     return `${VIEWER_BASE}/audit/${audit.slug || audit._id}`;
   }
@@ -126,19 +151,67 @@ export default function AuditList() {
           </div>
           <div className={styles.field}>
             <label className={styles.label}>{sourceType === 'business' ? 'Business' : 'Lead'} *</label>
-            <select className={styles.input} value={selectedId} onChange={e => setSelectedId(e.target.value)}>
-              <option value="">Select {sourceType === 'business' ? 'business' : 'lead'}...</option>
-              {sourceType === 'business'
-                ? businesses.map(b => <option key={b.businessId} value={b.businessId}>{b.businessName}</option>)
-                : leads.map(l => <option key={l._id || l.leadId} value={l._id || l.leadId}>{l.businessName || l.name}</option>)
-              }
-            </select>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <select className={styles.input} value={selectedId} onChange={e => setSelectedId(e.target.value)} style={{ flex: 1 }}>
+                <option value="">Select {sourceType === 'business' ? 'business' : 'lead'}...</option>
+                {sourceType === 'business'
+                  ? businesses.map(b => <option key={b.businessId} value={b.businessId}>{b.businessName}</option>)
+                  : leads.map(l => <option key={l._id || l.leadId} value={l._id || l.leadId}>{l.businessName || l.name}</option>)
+                }
+              </select>
+              {sourceType === 'lead' && (
+                <button type="button" className={styles.copyBtn} onClick={() => setShowNewLead(v => !v)} title="Create new lead">
+                  <FiUserPlus size={14} />
+                </button>
+              )}
+            </div>
           </div>
           <div className={styles.field}>
             <label className={styles.label}>Title (optional)</label>
             <input className={styles.input} value={title} onChange={e => setTitle(e.target.value)} placeholder="Site Audit - Business Name" />
           </div>
         </div>
+
+        {showNewLead && sourceType === 'lead' && (
+          <form className={styles.newLeadForm} onSubmit={handleCreateLead}>
+            <h3 className={styles.newLeadTitle}>New Lead</h3>
+            <div className={styles.grid}>
+              <div className={styles.field}>
+                <label className={styles.label}>Business Name *</label>
+                <input className={styles.input} required value={newLead.businessName} onChange={e => setNewLead(p => ({ ...p, businessName: e.target.value }))} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Owner Name</label>
+                <input className={styles.input} value={newLead.ownerName} onChange={e => setNewLead(p => ({ ...p, ownerName: e.target.value }))} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Phone *</label>
+                <input className={styles.input} required value={newLead.phone} onChange={e => setNewLead(p => ({ ...p, phone: e.target.value }))} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Email</label>
+                <input className={styles.input} type="email" value={newLead.email} onChange={e => setNewLead(p => ({ ...p, email: e.target.value }))} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Industry</label>
+                <select className={styles.input} value={newLead.industry} onChange={e => setNewLead(p => ({ ...p, industry: e.target.value }))}>
+                  <option value="">Select...</option>
+                  {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Website</label>
+                <input className={styles.input} value={newLead.website} onChange={e => setNewLead(p => ({ ...p, website: e.target.value }))} placeholder="https://" />
+              </div>
+            </div>
+            <div className={styles.actions}>
+              <button type="submit" className={styles.submitBtn} disabled={savingLead}>
+                {savingLead ? 'Saving...' : 'Create Lead'}
+              </button>
+              <button type="button" className={styles.copyBtn} onClick={() => setShowNewLead(false)}>Cancel</button>
+            </div>
+          </form>
+        )}
 
         <div className={styles.uploadZone} onClick={() => fileRef.current?.click()}>
           <input ref={fileRef} type="file" accept="video/mp4,video/webm" onChange={e => setFile(e.target.files[0])} />
