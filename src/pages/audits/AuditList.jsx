@@ -5,7 +5,7 @@ import { api } from '../../utils/api';
 import { INDUSTRIES } from '../../utils/constants';
 import styles from './audits.module.css';
 
-const VIEWER_BASE = import.meta.env.VITE_AUDIT_VIEWER_URL || window.location.origin;
+const VIEWER_BASE = 'https://app.salesconnectai.com';
 
 const emptyLead = { businessName: '', firstName: '', lastName: '', phone: '', email: '', industry: '' };
 
