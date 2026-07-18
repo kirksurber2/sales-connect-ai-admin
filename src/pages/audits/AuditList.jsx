@@ -7,7 +7,7 @@ import styles from './audits.module.css';
 
 const VIEWER_BASE = import.meta.env.VITE_AUDIT_VIEWER_URL || window.location.origin;
 
-const emptyLead = { businessName: '', ownerName: '', phone: '', email: '', industry: '', website: '' };
+const emptyLead = { businessName: '', firstName: '', lastName: '', phone: '', email: '', industry: '' };
 
 export default function AuditList() {
   const [audits, setAudits] = useState([]);
@@ -96,16 +96,25 @@ export default function AuditList() {
 
   async function handleCreateLead(e) {
     e.preventDefault();
-    if (!newLead.businessName || !newLead.phone) {
-      toast.error('Business name and phone are required');
+    if (!newLead.firstName || !newLead.lastName || !newLead.phone) {
+      toast.error('First name, last name, and phone are required');
       return;
     }
     setSavingLead(true);
     try {
-      const lead = await api.post('/leads', newLead);
+      const result = await api.post('/leads', {
+        firstName: newLead.firstName,
+        lastName: newLead.lastName,
+        businessName: newLead.businessName,
+        phone: newLead.phone,
+        email: newLead.email,
+        industry: newLead.industry,
+        source: 'manual-entry',
+      });
+      const lead = result.lead;
       setLeads(prev => [lead, ...prev]);
       setSourceType('lead');
-      setSelectedId(lead._id || lead.leadId);
+      setSelectedId(lead._id);
       setNewLead(emptyLead);
       setShowNewLead(false);
       toast.success('Lead created!');
@@ -177,12 +186,16 @@ export default function AuditList() {
             <h3 className={styles.newLeadTitle}>New Lead</h3>
             <div className={styles.grid}>
               <div className={styles.field}>
-                <label className={styles.label}>Business Name *</label>
-                <input className={styles.input} required value={newLead.businessName} onChange={e => setNewLead(p => ({ ...p, businessName: e.target.value }))} />
+                <label className={styles.label}>First Name *</label>
+                <input className={styles.input} required value={newLead.firstName} onChange={e => setNewLead(p => ({ ...p, firstName: e.target.value }))} />
               </div>
               <div className={styles.field}>
-                <label className={styles.label}>Owner Name</label>
-                <input className={styles.input} value={newLead.ownerName} onChange={e => setNewLead(p => ({ ...p, ownerName: e.target.value }))} />
+                <label className={styles.label}>Last Name *</label>
+                <input className={styles.input} required value={newLead.lastName} onChange={e => setNewLead(p => ({ ...p, lastName: e.target.value }))} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Business Name</label>
+                <input className={styles.input} value={newLead.businessName} onChange={e => setNewLead(p => ({ ...p, businessName: e.target.value }))} />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Phone *</label>
@@ -198,10 +211,6 @@ export default function AuditList() {
                   <option value="">Select...</option>
                   {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
                 </select>
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Website</label>
-                <input className={styles.input} value={newLead.website} onChange={e => setNewLead(p => ({ ...p, website: e.target.value }))} placeholder="https://" />
               </div>
             </div>
             <div className={styles.actions}>
