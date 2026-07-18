@@ -27,7 +27,7 @@ export default function AuditList() {
   useEffect(() => {
     api.get('/audits').then(setAudits).catch(() => {});
     api.get('/business').then(setBusinesses).catch(() => {});
-    api.get('/leads').then(setLeads).catch(() => {});
+    api.get('/leads').then(res => setLeads(res.leads || [])).catch(() => {});
   }, []);
 
   function slugify(str) {
