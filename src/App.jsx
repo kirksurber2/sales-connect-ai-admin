@@ -24,6 +24,8 @@ import Sops from './pages/sops/Sops';
 import SiteBuilder from './pages/sites/SiteBuilder';
 import Keywords from './pages/sites/Keywords';
 import PromptTemplates from './pages/sites/PromptTemplates';
+import AuditList from './pages/audits/AuditList';
+import AuditViewer from './pages/audits/AuditViewer';
 import styles from './App.module.css';
 
 function Layout({ children }) {
@@ -46,6 +48,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/audit/:slug" element={<AuditViewer />} />
           <Route path="/*" element={
             <ProtectedRoute>
               <Layout>
@@ -67,6 +70,7 @@ export default function App() {
                   <Route path="/sites/build" element={<SiteBuilder />} />
                   <Route path="/sites/keywords" element={<Keywords />} />
                   <Route path="/sites/templates" element={<PromptTemplates />} />
+                  <Route path="/audits" element={<AuditList />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>

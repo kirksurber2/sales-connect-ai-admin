@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { FiHome, FiUsers, FiShoppingCart, FiMessageSquare, FiDollarSign, FiUserCheck, FiFileText, FiBook, FiMenu, FiGlobe, FiTarget, FiLayers } from 'react-icons/fi';
+import { FiHome, FiUsers, FiShoppingCart, FiMessageSquare, FiDollarSign, FiUserCheck, FiFileText, FiBook, FiMenu, FiGlobe, FiTarget, FiLayers, FiVideo } from 'react-icons/fi';
 import styles from './Sidebar.module.css';
 
 const links = [
@@ -13,6 +13,7 @@ const links = [
   { to: '/sites/build', icon: FiGlobe, label: 'Site Builder' },
   { to: '/sites/templates', icon: FiLayers, label: 'Prompt Templates' },
   { to: '/sites/keywords', icon: FiTarget, label: 'SEO Keywords' },
+  { to: '/audits', icon: FiVideo, label: 'Video Audits' },
   { to: '/sops', icon: FiBook, label: 'SOPs' },
 ];
 

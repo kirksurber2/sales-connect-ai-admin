@@ -1,0 +1,220 @@
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.pageHeader h1 { font-size: 1.4rem; font-weight: 600; }
+
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.field { display: flex; flex-direction: column; gap: 0.25rem; }
+.full { grid-column: 1 / -1; }
+.label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+
+.input {
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.input:focus { border-color: var(--accent); }
+
+.textarea {
+  composes: input;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.submitBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius-btn);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.copyBtn:hover { border-color: var(--accent); }
+
+.table {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr 1.5fr;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr 1.5fr;
+  padding: 0.75rem 1rem;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.tableRow:last-child { border-bottom: none; }
+.tableRow:hover { background: var(--bg-hover); }
+.muted { color: var(--text-secondary); font-size: 0.85rem; }
+.empty { padding: 2rem; text-align: center; color: var(--text-muted); }
+
+.uploadZone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.uploadZone:hover { border-color: var(--accent); }
+
+.uploadZone input { display: none; }
+
+.progress {
+  margin-top: 1rem;
+  height: 6px;
+  background: var(--bg-hover);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--accent-gradient);
+  transition: width 0.3s;
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.linkInput {
+  composes: input;
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Viewer page (client-facing) */
+.viewer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.videoWrap {
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: #000;
+  margin-bottom: 1.5rem;
+}
+
+.videoWrap video {
+  width: 100%;
+  display: block;
+}
+
+.viewerHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.viewerHeader h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.viewerHeader p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.ctaBtn {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 1rem 2.5rem;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius-btn);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ctaBtn:hover { opacity: 0.9; }
+
+.deleteBtn {
+  background: none;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  color: #dc2626;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.deleteBtn:hover { background: #dc262610; }
