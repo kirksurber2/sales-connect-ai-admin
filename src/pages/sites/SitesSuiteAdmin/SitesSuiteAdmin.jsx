@@ -51,13 +51,13 @@ async function authHeaders() {
 async function getAdminOrders(status) {
   const headers = await authHeaders();
   const params = status ? `?status=${status}` : '';
-  const res = await axios.get(`${BASE}/sites-suite/orders/admin${params}`, { headers });
+  const res = await axios.get(`${BASE}/orders/admin${params}`, { headers });
   return res.data;
 }
 
 async function updateAdminOrder(orderId, payload) {
   const headers = await authHeaders();
-  const res = await axios.patch(`${BASE}/sites-suite/orders/admin/${orderId}`, payload, { headers });
+  const res = await axios.patch(`${BASE}/orders/admin/${orderId}`, payload, { headers });
   return res.data;
 }
 
