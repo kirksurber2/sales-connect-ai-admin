@@ -1,0 +1,306 @@
+.ssa-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.ssa-header { margin-bottom: 1.5rem; }
+
+.ssa-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.ssa-title-icon { font-size: 1.4rem; color: #0ea5e9; }
+.ssa-title-row h1 { font-size: 1.6rem; font-weight: 800; margin: 0; }
+.ssa-subtitle { color: var(--text-secondary, #94a3b8); font-size: 0.9rem; margin: 0; }
+
+.ssa-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.ssa-filter-tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+.ssa-filter-tab {
+  background: transparent;
+  border: 1px solid var(--border, #334155);
+  color: var(--text-secondary, #94a3b8);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ssa-filter-tab.active {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: #fff;
+}
+
+.ssa-refresh-btn {
+  background: transparent;
+  border: 1px solid var(--border, #334155);
+  color: var(--text-secondary, #94a3b8);
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.ssa-loading, .ssa-empty {
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Orders list */
+.ssa-orders-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.ssa-order-row {
+  background: var(--card-bg, #1e293b);
+  border: 1px solid var(--border, #334155);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.ssa-order-row:hover { border-color: #0ea5e9; }
+
+.ssa-order-row-left { flex: 1; min-width: 0; }
+.ssa-order-row-left strong { display: block; font-size: 0.95rem; margin-bottom: 0.4rem; }
+
+.ssa-order-row-meta { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.ssa-order-row-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.ssa-biz-id {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #94a3b8);
+  font-family: monospace;
+}
+
+.ssa-tag {
+  font-size: 0.72rem;
+  background: rgba(14, 165, 233, 0.12);
+  color: #0ea5e9;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-weight: 600;
+}
+
+.ssa-tag.prompt-ready { font-size: 0.72rem; border-radius: 999px; padding: 0.18rem 0.55rem; }
+
+.ssa-order-date { font-size: 0.75rem; color: var(--text-secondary, #94a3b8); }
+
+.ssa-status-select {
+  background: var(--card-bg, #1e293b);
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  color: var(--text-primary, #f1f5f9);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Detail */
+.ssa-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border, #334155);
+  color: var(--text-secondary, #94a3b8);
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+}
+
+.ssa-detail-header { margin-bottom: 1.5rem; }
+
+.ssa-detail-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ssa-detail-title-row h2 { font-size: 1.3rem; font-weight: 700; margin: 0; }
+
+.ssa-detail-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.ssa-section-block {
+  background: var(--card-bg, #1e293b);
+  border: 1px solid var(--border, #334155);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.ssa-section-block h3 { font-size: 1rem; font-weight: 700; margin: 0 0 0.75rem; }
+
+.ssa-section-block p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #94a3b8);
+  line-height: 1.6;
+}
+
+.ssa-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ssa-section-header h3 { margin: 0; }
+
+.ssa-pre {
+  font-family: monospace;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ssa-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #0ea5e9, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  transition: opacity 0.15s;
+}
+
+.ssa-copy-btn.copied { background: var(--success, #22c55e); }
+
+.ssa-bullets-block {
+  margin-bottom: 1rem;
+}
+
+.ssa-bullets-block label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+.ssa-bullets-block ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.ssa-bullets-block li {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin-bottom: 0.25rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.ssa-prompt-output {
+  background: var(--bg-deep, #0f172a);
+  border: 1px solid var(--border, #334155);
+  border-radius: 8px;
+  padding: 1.25rem;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--text-primary, #f1f5f9);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 600px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+}
+
+.ssa-processing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.ssa-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+.ssa-gaps-block {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.ssa-gaps-note {
+  font-size: 0.82rem;
+  color: #f59e0b;
+  margin: 0 0 0.75rem;
+}
+
+.ssa-gaps-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.ssa-gaps-list li {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.ssa-no-prompt p {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.spin {
+  animation: ssa-spin 0.75s linear infinite;
+}
+
+@keyframes ssa-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
