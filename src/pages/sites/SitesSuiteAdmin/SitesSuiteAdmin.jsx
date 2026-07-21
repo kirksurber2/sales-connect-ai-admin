@@ -199,9 +199,93 @@ export default function SitesSuiteAdmin() {
   );
 }
 
+// ─── BUILD PROMPT GENERATOR ───
+function generateBuildPrompt(order) {
+  const b = order.branding || {};
+  const sg = b.styleGuide || {};
+  const voice = b.voice || {};
+  const avatar = b.customerAvatar || {};
+  const ec = order.ecommerce;
+  const pillarObj = PILLARS.find(p => p.key === order.pillar);
+
+  return `Build a ${order.buildType || 'custom'} Next.js website for ${order.siteName || '[Site Name]'}.
+
+You are an expert Next.js developer. Generate a complete, deployable Next.js 14+ project (App Router) with CSS Modules. The site must be fully responsive, statically exported (output: 'export'), score 95+ on PageSpeed mobile, and look like a $5,000 custom build.
+
+---
+
+BUSINESS CONTEXT
+- Tagline: ${b.tagline || '[tagline]'}
+- Core Offer: ${b.coreOffer || '[core offer]'}
+- Brand Tone: ${voice.tone || '[tone]'}${voice.brandVoice ? ` — ${voice.brandVoice}` : ''}
+- Target Customer: ${avatar.description || '[customer description]'}
+- Pain Points: ${Array.isArray(avatar.painPoints) ? avatar.painPoints.join(', ') : (avatar.painPoints || '[pain points]')}
+- Differentiators: ${Array.isArray(b.differentiators) ? b.differentiators.join(' · ') : (b.differentiators || '[differentiators]')}
+- Guarantees: ${Array.isArray(b.guarantees) ? b.guarantees.join(' · ') : (b.guarantees || '[guarantees]')}
+- Service Area: ${b.serviceArea || '[service area]'}
+${b.ownerPersona ? `- Owner Persona: ${b.ownerPersona}` : ''}
+
+---
+
+STYLE GUIDE
+- Primary Color: ${sg.primaryColor || '[primary]'}
+- Secondary Color: ${sg.secondaryColor || '[secondary]'}
+- Heading Font: ${sg.fontHeading || 'Inter'}
+- Body Font: ${sg.fontBody || 'Inter'}
+- Button Style: ${sg.buttonStyle || 'Gradient'}
+${sg.logoUrl ? `- Logo URL: ${sg.logoUrl}` : ''}
+${sg.bgDark ? `- BG Dark: ${sg.bgDark}` : ''}
+${sg.bgLight ? `- BG Light: ${sg.bgLight}` : ''}
+
+---
+
+PAGES TO BUILD
+${order.selectedPages?.length ? order.selectedPages.map(p => `- ${p}`).join('\n') : '- Home, About, Services, Contact'}
+
+---
+
+STRATEGY PILLAR
+${pillarObj ? `${pillarObj.label} — ${pillarObj.desc}` : (order.pillar || '[pillar]')}
+${order.description ? `\nClient Notes: ${order.description}` : ''}
+
+---
+${ec ? `
+ECOMMERCE REQUIREMENTS
+- Product Categories: ${ec.categories?.join(', ') || '[categories]'} — client manages these in admin panel
+- Payment Processor: ${ec.paymentProcessor || '[processor]'}
+- Size Variants: ${ec.sizeVariants ? 'Yes' : 'No'}
+- Estimated Products: ${ec.estimatedProducts || '[count]'}
+- Admin panel needed: product management, pricing, order management, category management
+- Cart, checkout, order confirmation flow required
+${ec.notes ? `- Notes: ${ec.notes}` : ''}
+
+---
+` : ''}
+${order.referenceLinks ? `REFERENCE SITES
+${order.referenceLinks}
+
+---
+` : ''}
+TECHNICAL REQUIREMENTS
+- Framework: Next.js 14+ (App Router)
+- Styling: CSS Modules (no Tailwind)
+- Output: Static export (next.config.mjs → output: 'export')
+- Font Loading: next/font/google
+- Icons: react-icons
+- Structured Data: LocalBusiness JSON-LD on every page
+- Sitemap: app/sitemap.js
+- Meta Tags: unique title + description per page
+- Open Graph: per page
+
+Generate the complete file structure with every file fully implemented. Include component breakdown, layout, and all pages. Make it production-ready.`;
+}
+
 // ─── ORDER DETAIL ───
-function OrderDetail({ order, onBack, onStatusChange }) {
+function OrderDetail({ order: initialOrder, onBack, onStatusChange }) {
+  const [order, setOrder] = useState(initialOrder);
   const [copied, setCopied] = useState(false);
+  const [buildCopied, setBuildCopied] = useState(false);
+  const [generatingBuild, setGeneratingBuild] = useState(false);
   const gp = order.generatedPage;
   const TypeIcon = ORDER_TYPE_ICONS[order.orderType] || FaGlobe;
   const typeColor = ORDER_TYPE_COLORS[order.orderType] || '#0ea5e9';
@@ -211,6 +295,30 @@ function OrderDetail({ order, onBack, onStatusChange }) {
     setCopied(true);
     toast.success('Prompt copied — paste into VS Code / Q / Kiro');
     setTimeout(() => setCopied(false), 3000);
+  };
+
+  const copyBuild = (text) => {
+    navigator.clipboard.writeText(text);
+    setBuildCopied(true);
+    toast.success('Build prompt copied!');
+    setTimeout(() => setBuildCopied(false), 3000);
+  };
+
+  const handleGenerateBuildPrompt = async () => {
+    setGeneratingBuild(true);
+    try {
+      const prompt = generateBuildPrompt(order);
+      const now = new Date().toISOString();
+      await updateAdminOrder(order._id, {
+        generatedBuildPrompt: prompt,
+        promptGeneratedAt: now,
+        status: 'In Progress',
+      });
+      setOrder(prev => ({ ...prev, generatedBuildPrompt: prompt, promptGeneratedAt: now, status: 'In Progress' }));
+      onStatusChange(order._id, 'In Progress');
+      toast.success('Build prompt generated!');
+    } catch { toast.error('Failed to save prompt'); }
+    finally { setGeneratingBuild(false); }
   };
 
   const pillar = PILLARS.find(p => p.key === (order.pillar || gp?.pillar));
@@ -325,6 +433,42 @@ function OrderDetail({ order, onBack, onStatusChange }) {
               </div>
             </div>
           )}
+
+          {/* ── Generate Build Prompt ── */}
+          <div className="ssa-section-block">
+            <div className="ssa-section-header">
+              <h3><FaHammer size={14} /> Build Prompt</h3>
+              {order.promptGeneratedAt && (
+                <span className="ssa-tag" style={{ background: '#22c55e22', color: '#22c55e', borderColor: '#22c55e44' }}>
+                  Generated {new Date(order.promptGeneratedAt).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+            {order.generatedBuildPrompt ? (
+              <>
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <button className={`ssa-copy-btn ${buildCopied ? 'copied' : ''}`} onClick={() => copyBuild(order.generatedBuildPrompt)}>
+                    {buildCopied ? <><FaCheck /> Copied!</> : <><FaCopy /> Copy Full Prompt — Paste into VS Code / Q / Kiro</>}
+                  </button>
+                  <button className="ssa-refresh-btn" onClick={handleGenerateBuildPrompt} disabled={generatingBuild}>
+                    {generatingBuild ? <><FaSpinner className="spin" /> Regenerating...</> : <><FiRefreshCw size={13} /> Regenerate</>}
+                  </button>
+                </div>
+                <pre className="ssa-prompt-output">{order.generatedBuildPrompt}</pre>
+              </>
+            ) : (
+              <>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                  No build prompt yet. Generate one from the order details and branding snapshot above.
+                </p>
+                <button className="ssa-copy-btn" onClick={handleGenerateBuildPrompt} disabled={generatingBuild}>
+                  {generatingBuild
+                    ? <><FaSpinner className="spin" /> Generating...</>
+                    : <><FaHammer size={13} /> Generate Build Prompt</>}
+                </button>
+              </>
+            )}
+          </div>
         </>
       )}
 
