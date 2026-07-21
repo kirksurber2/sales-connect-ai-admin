@@ -10,6 +10,7 @@ export const SITE_BUILD_TYPES = [
   'Professional Services',
   'Photographer / Creative',
   'Restaurant / Food',
+  'Beauty & Wellness',
   'Ecommerce',
   'SaaS / App',
 ];
