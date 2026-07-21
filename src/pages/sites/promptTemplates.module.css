@@ -303,3 +303,54 @@
   color: var(--text-muted);
   margin-top: 0.5rem;
 }
+
+.tokenDetails {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tokenSummary {
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-hover);
+  list-style: none;
+}
+
+.tokenSummary:hover { color: var(--accent); }
+
+.tokenGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0;
+  padding: 0.5rem;
+  background: #0a0f1a;
+}
+
+.tokenRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+}
+
+.tokenRow:hover { background: var(--bg-hover); }
+
+.tokenCode {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.72rem;
+  color: #7dd3fc;
+  white-space: nowrap;
+  min-width: 180px;
+}
+
+.tokenDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

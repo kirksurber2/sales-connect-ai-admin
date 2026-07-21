@@ -207,12 +207,81 @@ export default function PromptTemplates() {
             <h3 className={styles.sectionTitle}>Raw Prompt</h3>
             <p className={styles.hint}>
               {typeTab === 'page'
-                ? 'The base page-building prompt for this industry. At build time, business branding (colors, fonts, voice, avatar) and page-specific data (transcript brief, pillar strategy, services, SEO) are injected automatically.'
-                : 'The base site-building prompt for this industry. At build time, business branding, services, social proof, order details (pages, pillar, ecommerce), and SEO are injected automatically.'}
+                ? 'Base page-building prompt for this build type. At build time, business branding, page brief, pillar strategy, services, and SEO are injected automatically using the tokens below.'
+                : 'Base site-building prompt for this build type. At build time, business branding, services, social proof, order details (pages, pillar, ecommerce), and SEO are injected automatically using the tokens below.'}
             </p>
+
+            {/* Token reference */}
+            <details className={styles.tokenDetails}>
+              <summary className={styles.tokenSummary}>Available Injection Tokens</summary>
+              <div className={styles.tokenGrid}>
+                {[
+                  ['[BUSINESS_NAME]', 'Site / business name'],
+                  ['[OWNER_NAME]', 'Owner name'],
+                  ['[INDUSTRY]', 'Industry from sitePrompt'],
+                  ['[PHONE]', 'Phone'],
+                  ['[EMAIL]', 'Email'],
+                  ['[ADDRESS]', 'Address'],
+                  ['[SERVICE_AREA]', 'Service area'],
+                  ['[DOMAIN]', 'Domain'],
+                  ['[HOURS]', 'Hours of operation'],
+                  ['[TAGLINE]', 'Brand tagline'],
+                  ['[CORE_OFFER]', 'Core offer statement'],
+                  ['[BRAND_VOICE]', 'Brand voice description'],
+                  ['[TONE]', 'Brand tone'],
+                  ['[WORDS_TO_AVOID]', 'Words to avoid'],
+                  ['[PREFERRED_PHRASES]', 'Preferred phrases'],
+                  ['[DIFFERENTIATORS]', 'Differentiators list'],
+                  ['[KEY_SELLING_POINTS]', 'Key selling points'],
+                  ['[GUARANTEES]', 'Guarantees list'],
+                  ['[CUSTOMER_AVATAR]', 'Target customer description'],
+                  ['[PAIN_POINTS]', 'Customer pain points'],
+                  ['[OWNER_BACKSTORY]', 'Owner backstory'],
+                  ['[PRIMARY_COLOR]', 'Primary brand color'],
+                  ['[SECONDARY_COLOR]', 'Secondary brand color'],
+                  ['[ACCENT_COLOR]', 'Accent color'],
+                  ['[FONT_HEADING]', 'Heading font'],
+                  ['[FONT_BODY]', 'Body font'],
+                  ['[BUTTON_STYLE]', 'Button style'],
+                  ['[BUTTON_RADIUS]', 'Button border radius'],
+                  ['[CARD_RADIUS]', 'Card border radius'],
+                  ['[LOGO_URL]', 'Logo URL'],
+                  ['[PILLAR_LABEL]', 'Strategy pillar name'],
+                  ['[PILLAR_DIRECTION]', 'Strategy pillar copy direction'],
+                  ['[SERVICES_LIST]', 'Formatted services list'],
+                  ['[YEARS_IN_BUSINESS]', 'Years in business'],
+                  ['[JOBS_COMPLETED]', 'Jobs completed'],
+                  ['[GOOGLE_RATING]', 'Google rating'],
+                  ['[CERTIFICATIONS]', 'Certifications'],
+                  ['[TESTIMONIALS]', 'Formatted testimonials'],
+                  ['[WHY_CHOOSE_US]', 'Why choose us points'],
+                  ['[PRIMARY_KEYWORD]', 'Primary SEO keyword'],
+                  ['[SECONDARY_KEYWORDS]', 'Secondary keywords'],
+                  ['[LOCAL_MODIFIERS]', 'Local SEO modifiers'],
+                  ['[PAGES_LIST]', 'Pages to build from order'],
+                  ['[ECOMMERCE_BLOCK]', 'Full ecommerce requirements block'],
+                  ['[ECOMMERCE_CATEGORIES]', 'Product categories'],
+                  ['[PAYMENT_PROCESSOR]', 'Payment processor'],
+                  ['[SIZE_VARIANTS]', 'Size variants yes/no'],
+                  ['[REFERENCE_LINKS]', 'Reference site URLs'],
+                  ['[CLIENT_NOTES]', 'Client notes from order'],
+                  ['[AI_INSTRUCTIONS]', 'Template AI instructions'],
+                  ['[GA_ID]', 'Google Analytics ID'],
+                  ['[FB_PIXEL]', 'Facebook Pixel ID'],
+                  ['[GTM_ID]', 'GTM ID'],
+                  ['[SCA_WIDGET]', 'SCA booking widget yes/no'],
+                ].map(([token, desc]) => (
+                  <div key={token} className={styles.tokenRow}>
+                    <code className={styles.tokenCode}>{token}</code>
+                    <span className={styles.tokenDesc}>{desc}</span>
+                  </div>
+                ))}
+              </div>
+            </details>
+
             <textarea className={styles.rawPrompt} value={form.rawPrompt || ''} onChange={e => set('rawPrompt', e.target.value)} placeholder={typeTab === 'page'
-              ? 'You are an expert Next.js developer. Build ONE single page...\n\n## PAGE\nTitle: [PAGE_TITLE]\nStrategy: [PILLAR_STRATEGY]\n\n## BUSINESS\nName: [BUSINESS_NAME]\n...'
-              : 'You are an expert Next.js developer. Build a complete Next.js site...\n\n## BUSINESS\nName: [BUSINESS_NAME]\nIndustry: [INDUSTRY]\n\n## BRAND\nTagline: [TAGLINE]\n...'
+              ? 'You are an expert Next.js developer. Build ONE single page...\n\n## PAGE\nTitle: [PAGE_TITLE]\nStrategy: [PILLAR_LABEL]\n\n## BUSINESS\nName: [BUSINESS_NAME]\n...'
+              : 'You are an expert Next.js developer. Build a complete Next.js site...\n\n## BUSINESS\nName: [BUSINESS_NAME]\n\n## BRAND\nTagline: [TAGLINE]\nVoice: [BRAND_VOICE]\n...'
             } />
             <div className={styles.charCount}>{(form.rawPrompt || '').length} characters</div>
           </div>
