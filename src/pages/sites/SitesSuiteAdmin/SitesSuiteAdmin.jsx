@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { FaGlobe, FaSpinner, FaCopy, FaChevronLeft, FaCheck, FaServer, FaHammer, FaShoppingCart } from 'react-icons/fa';
-import { FiRefreshCw, FiAlertTriangle, FiLink, FiVideo, FiFilter, FiSearch } from 'react-icons/fi';
+import { FiRefreshCw, FiAlertTriangle, FiLink, FiVideo, FiFilter, FiSearch, FiZap, FiTrendingUp, FiShield, FiChevronsRight, FiChevronsLeft, FiTarget, FiImage } from 'react-icons/fi';
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import './SitesSuiteAdmin.css';
