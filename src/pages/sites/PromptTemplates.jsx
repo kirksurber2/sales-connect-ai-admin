@@ -8,10 +8,8 @@ import styles from './promptTemplates.module.css';
 
 const EMPTY_TEMPLATE = {
   name: '', industry: '', description: '', isActive: true,
-  styleGuide: { primaryColor: '#1e3a5f', secondaryColor: '#f59e0b', accentColor: '#ffffff', bgDark: '#0f172a', bgLight: '#f8fafc', fontHeading: 'Inter', fontBody: 'Inter', buttonStyle: 'Gradient', borderRadiusCards: '16px', borderRadiusButtons: '12px' },
   services: [{ name: '', description: '', bullets: '' }],
   seo: { primaryKeyword: '', secondaryKeywords: [], localModifiers: [] },
-  copyVoice: { voice: '', avoid: '', emphasize: '', ctaStyle: 'Direct and action-oriented' },
   pages: { galleryPage: false, faqPage: false, reviewsPage: true, financingPage: false, serviceAreaPage: true },
   hero: { ctaButton1: 'Get a Free Quote', ctaButton2: 'Call Now', heroBackground: 'gradient' },
   faqs: [{ q: '', a: '' }],
@@ -190,19 +188,6 @@ Business Name: [Business Name]
           {tab === 'settings' && (
             <>
 
-          {/* Style Guide Defaults */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default Style Guide</h3>
-            <div className={styles.grid}>
-              <div className={styles.field}><label className={styles.label}>Primary Color</label><input className={styles.input} value={form.styleGuide.primaryColor} onChange={e => setNested('styleGuide', 'primaryColor', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>Secondary Color</label><input className={styles.input} value={form.styleGuide.secondaryColor} onChange={e => setNested('styleGuide', 'secondaryColor', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>Heading Font</label><input className={styles.input} value={form.styleGuide.fontHeading} onChange={e => setNested('styleGuide', 'fontHeading', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>Body Font</label><input className={styles.input} value={form.styleGuide.fontBody} onChange={e => setNested('styleGuide', 'fontBody', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>Button Style</label><input className={styles.input} value={form.styleGuide.buttonStyle} onChange={e => setNested('styleGuide', 'buttonStyle', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>Card Radius</label><input className={styles.input} value={form.styleGuide.borderRadiusCards} onChange={e => setNested('styleGuide', 'borderRadiusCards', e.target.value)} /></div>
-            </div>
-          </div>
-
           {/* SEO Defaults */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Default SEO Strategy</h3>
@@ -210,17 +195,6 @@ Business Name: [Business Name]
               <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Primary Keyword Pattern</label><input className={styles.input} value={form.seo.primaryKeyword} onChange={e => setNested('seo', 'primaryKeyword', e.target.value)} placeholder="[service] [city]" /></div>
               <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Secondary Keywords (comma-separated)</label><input className={styles.input} value={form.seo.secondaryKeywords} onChange={e => setNested('seo', 'secondaryKeywords', e.target.value)} placeholder="[service] near me, best [service] [city]" /></div>
               <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Local Modifiers (comma-separated)</label><input className={styles.input} value={form.seo.localModifiers} onChange={e => setNested('seo', 'localModifiers', e.target.value)} placeholder="[city], [suburb1], [suburb2]" /></div>
-            </div>
-          </div>
-
-          {/* Copy Voice */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default Tone & Voice</h3>
-            <div className={styles.grid}>
-              <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Voice</label><input className={styles.input} value={form.copyVoice.voice} onChange={e => setNested('copyVoice', 'voice', e.target.value)} placeholder="Professional but approachable..." /></div>
-              <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Avoid</label><input className={styles.input} value={form.copyVoice.avoid} onChange={e => setNested('copyVoice', 'avoid', e.target.value)} placeholder="Generic phrases, corporate speak..." /></div>
-              <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Emphasize</label><input className={styles.input} value={form.copyVoice.emphasize} onChange={e => setNested('copyVoice', 'emphasize', e.target.value)} placeholder="Speed, reliability, local trust..." /></div>
-              <div className={styles.field}><label className={styles.label}>CTA Style</label><input className={styles.input} value={form.copyVoice.ctaStyle} onChange={e => setNested('copyVoice', 'ctaStyle', e.target.value)} /></div>
             </div>
           </div>
 

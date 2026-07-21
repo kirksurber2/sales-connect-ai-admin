@@ -7,6 +7,7 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 import './SitesSuiteAdmin.css';
 
 const BASE = import.meta.env.VITE_SITES_SUITE_API || import.meta.env.VITE_API_BASE;
+const BUSINESS_API = import.meta.env.VITE_BUSINESS_API;
 
 const ORDER_STATUSES = ['Pending', 'In Progress', 'Review', 'Revisions', 'Complete'];
 export const PILLARS = [
@@ -200,84 +201,161 @@ export default function SitesSuiteAdmin() {
 }
 
 // ─── BUILD PROMPT GENERATOR ───
-function generateBuildPrompt(order) {
-  const b = order.branding || {};
+function generateBuildPrompt(order, branding, sitePrompt) {
+  const b = branding || {};
   const sg = b.styleGuide || {};
   const voice = b.voice || {};
   const avatar = b.customerAvatar || {};
+  const sp = sitePrompt || {};
+  const proof = sp.socialProof || {};
   const ec = order.ecommerce;
   const pillarObj = PILLARS.find(p => p.key === order.pillar);
 
-  return `Build a ${order.buildType || 'custom'} Next.js website for ${order.siteName || '[Site Name]'}.
+  const services = (sp.services || []).map(s =>
+    `- ${s.name}${s.description ? `: ${s.description}` : ''}${s.keyPoints ? ` (${s.keyPoints})` : ''}`
+  ).join('\n');
 
-You are an expert Next.js developer. Generate a complete, deployable Next.js 14+ project (App Router) with CSS Modules. The site must be fully responsive, statically exported (output: 'export'), score 95+ on PageSpeed mobile, and look like a $5,000 custom build.
+  const testimonials = (proof.testimonials || []).map(t =>
+    `"${t.quote}" — ${t.name}${t.location ? `, ${t.location}` : ''}`
+  ).join('\n');
+
+  const seoBlock = sp.seo?.primaryKeyword ? `Primary Keyword: ${sp.seo.primaryKeyword}
+Secondary Keywords: ${(sp.seo.secondaryKeywords || []).join(', ')}
+Local Modifiers: ${(sp.seo.localModifiers || []).join(', ')}` : '';
+
+  const borderRadiusBtn = sg.buttonStyle === 'Pill' ? '50px' : '8px';
+
+  const PILLAR_STRATEGY = {
+    'seo': { label: 'SEO', direction: 'Structure every section for search. Keyword-rich H1, H2s as search queries, meta title + description, LocalBusiness schema.' },
+    'problem-solution': { label: 'Problem → Solution', direction: 'Open by agitating the exact pain. Make them feel understood before revealing the solution. Hero names the problem, not the service.' },
+    'achievement-result': { label: 'Achievement & End Result', direction: 'Lead with the transformation. Every headline paints life after working with this business. Benefits are outcomes, never features.' },
+    'trust-authority': { label: 'Trust & Authority', direction: 'Lead with proof. Years, ratings, certifications front and center. Every claim backed by evidence. FAQ handles hardest objections.' },
+    'frictionless': { label: 'Frictionless Experience', direction: 'Short and scannable. One primary CTA repeated top/middle/bottom. Visitor understands the offer and can act in under 30 seconds.' },
+    'buyer-intent': { label: 'Buyer Intent', direction: 'Skip education. Lead immediately with offer, outcome, CTA. Urgency throughout. Built for someone searching to buy today.' },
+    'photo-gallery': { label: 'Photo Gallery', direction: 'Showcase work visually. Grid-first layout. Categories, before/after, project descriptions. CTAs between gallery sections.' },
+  };
+  const strategy = PILLAR_STRATEGY[order.pillar] || PILLAR_STRATEGY['problem-solution'];
+
+  return `You are an expert Next.js developer. Build a complete ${order.buildType || 'custom'} Next.js site for ${order.siteName || '[Site Name]'}.
+
+Generate every file in the file structure. All pages fully styled and production-ready. Mobile-first, statically exported (output: 'export'), 95+ PageSpeed mobile.
 
 ---
 
-BUSINESS CONTEXT
-- Tagline: ${b.tagline || '[tagline]'}
-- Core Offer: ${b.coreOffer || '[core offer]'}
-- Brand Tone: ${voice.tone || '[tone]'}${voice.brandVoice ? ` — ${voice.brandVoice}` : ''}
-- Target Customer: ${avatar.description || '[customer description]'}
-- Pain Points: ${Array.isArray(avatar.painPoints) ? avatar.painPoints.join(', ') : (avatar.painPoints || '[pain points]')}
-- Differentiators: ${Array.isArray(b.differentiators) ? b.differentiators.join(' · ') : (b.differentiators || '[differentiators]')}
-- Guarantees: ${Array.isArray(b.guarantees) ? b.guarantees.join(' · ') : (b.guarantees || '[guarantees]')}
-- Service Area: ${b.serviceArea || '[service area]'}
-${b.ownerPersona ? `- Owner Persona: ${b.ownerPersona}` : ''}
+## STRATEGY PILLAR: ${strategy.label}
+
+${strategy.direction}
 
 ---
 
-STYLE GUIDE
-- Primary Color: ${sg.primaryColor || '[primary]'}
-- Secondary Color: ${sg.secondaryColor || '[secondary]'}
-- Heading Font: ${sg.fontHeading || 'Inter'}
-- Body Font: ${sg.fontBody || 'Inter'}
-- Button Style: ${sg.buttonStyle || 'Gradient'}
-${sg.logoUrl ? `- Logo URL: ${sg.logoUrl}` : ''}
-${sg.bgDark ? `- BG Dark: ${sg.bgDark}` : ''}
-${sg.bgLight ? `- BG Light: ${sg.bgLight}` : ''}
+## BUSINESS
+
+Name: ${order.siteName || '[Site Name]'}
+Industry: ${sp.industry || '[Industry]'}
+Owner: ${sp.ownerName || b.ownerPersona?.name || '[Owner]'}
+Phone: ${sp.phone || '[Phone]'}
+Email: ${sp.email || '[Email]'}
+Address: ${sp.address || '[Address]'}
+Service Area: ${b.serviceArea || sp.serviceArea || '[Service Area]'}
+Domain: ${sp.domain || '[Domain]'}
 
 ---
 
-PAGES TO BUILD
+## BRAND
+
+Tagline: ${b.tagline || '[tagline]'}
+Core Offer: ${b.coreOffer || '[core offer]'}
+Brand Voice: ${voice.brandVoice || '[voice]'}
+Tone: ${voice.tone || '[tone]'}
+Words to Avoid: ${(voice.wordsToAvoid || []).join(', ') || '[none]'}
+Preferred Phrases: ${(voice.preferredPhrases || []).join(', ') || '[none]'}
+Differentiators: ${(b.differentiators || []).join(' · ') || '[differentiators]'}
+Key Selling Points: ${(b.keySellingPoints || []).join(' · ') || '[selling points]'}
+Guarantees: ${(b.guarantees || []).join(' · ') || '[guarantees]'}
+Target Customer: ${avatar.description || '[customer description]'}
+Pain Points: ${(avatar.painPoints || []).join(', ') || '[pain points]'}
+${b.ownerPersona?.backstory ? `Owner Story: ${b.ownerPersona.backstory}` : ''}
+
+---
+
+## STYLE
+
+Primary Color: ${sg.primaryColor || '#1e3a5f'}
+Secondary Color: ${sg.secondaryColor || '#f59e0b'}
+Accent Color: ${sg.accentColor || '#ffffff'}
+Font Heading: ${sg.fontHeading || 'Inter'}
+Font Body: ${sg.fontBody || 'Inter'}
+Button Style: ${sg.buttonStyle || 'Solid'}
+Button Radius: ${borderRadiusBtn}
+Card Radius: ${sg.borderRadius || '16px'}
+Logo: ${sg.logoUrl || '/logo.png'}
+
+---
+
+## SERVICES
+
+${services || '[Derive from business context]'}
+
+---
+
+## SOCIAL PROOF
+
+Years in Business: ${proof.yearsInBusiness || '[Years]'}
+Jobs Completed: ${proof.jobsCompleted || '[Jobs]'}
+Google Rating: ${proof.googleRating || '[Rating]'}
+Certifications: ${proof.certifications || '[Certifications]'}
+Guarantees: ${(b.guarantees || []).join(', ') || '[Guarantees]'}
+${testimonials ? `Testimonials:
+${testimonials}` : 'Testimonials: [Use realistic placeholders]'}
+
+---
+
+## PAGES TO BUILD
+
 ${order.selectedPages?.length ? order.selectedPages.map(p => `- ${p}`).join('\n') : '- Home, About, Services, Contact'}
-
----
-
-STRATEGY PILLAR
-${pillarObj ? `${pillarObj.label} — ${pillarObj.desc}` : (order.pillar || '[pillar]')}
-${order.description ? `\nClient Notes: ${order.description}` : ''}
-
----
 ${ec ? `
-ECOMMERCE REQUIREMENTS
-- Product Categories: ${ec.categories?.join(', ') || '[categories]'} — client manages these in admin panel
+---
+
+## ECOMMERCE
+
+- Categories: ${(ec.categories || []).join(', ') || '[categories]'} — client manages in admin panel
 - Payment Processor: ${ec.paymentProcessor || '[processor]'}
 - Size Variants: ${ec.sizeVariants ? 'Yes' : 'No'}
 - Estimated Products: ${ec.estimatedProducts || '[count]'}
-- Admin panel needed: product management, pricing, order management, category management
-- Cart, checkout, order confirmation flow required
-${ec.notes ? `- Notes: ${ec.notes}` : ''}
+- Needs: cart, checkout, order confirmation, product/category/order admin panel
+${ec.notes ? `- Notes: ${ec.notes}` : ''}` : ''}
+${order.referenceLinks ? `
+---
+
+## REFERENCE SITES
+
+${order.referenceLinks}` : ''}
+${seoBlock ? `
+---
+
+## SEO
+
+${seoBlock}` : ''}
+${order.description ? `
+---
+
+## CLIENT NOTES
+
+${order.description}` : ''}
 
 ---
-` : ''}
-${order.referenceLinks ? `REFERENCE SITES
-${order.referenceLinks}
 
----
-` : ''}
-TECHNICAL REQUIREMENTS
-- Framework: Next.js 14+ (App Router)
-- Styling: CSS Modules (no Tailwind)
-- Output: Static export (next.config.mjs → output: 'export')
-- Font Loading: next/font/google
-- Icons: react-icons
-- Structured Data: LocalBusiness JSON-LD on every page
+## TECHNICAL REQUIREMENTS
+
+- Next.js 14+ App Router, CSS Modules (no Tailwind)
+- Static export: next.config.mjs → output: 'export'
+- next/font/google for fonts
+- LocalBusiness JSON-LD + meta/OG tags on every page
 - Sitemap: app/sitemap.js
-- Meta Tags: unique title + description per page
-- Open Graph: per page
+- Mobile-first, fully responsive
+- 'use client' only in component files, never in page.jsx
 
-Generate the complete file structure with every file fully implemented. Include component breakdown, layout, and all pages. Make it production-ready.`;
+Generate the complete file structure with every file fully implemented. Include component breakdown and all pages. Production-ready.`;
 }
 
 // ─── ORDER DETAIL ───
@@ -307,7 +385,12 @@ function OrderDetail({ order: initialOrder, onBack, onStatusChange }) {
   const handleGenerateBuildPrompt = async () => {
     setGeneratingBuild(true);
     try {
-      const prompt = generateBuildPrompt(order);
+      const headers = await authHeaders();
+      const [brandingRes, sitePromptRes] = await Promise.all([
+        axios.get(`${BUSINESS_API}/business/${order.businessId}/branding`, { headers }),
+        axios.get(`${BUSINESS_API}/business/${order.businessId}/site-prompt`, { headers }).catch(() => ({ data: null })),
+      ]);
+      const prompt = generateBuildPrompt(order, brandingRes.data, sitePromptRes.data);
       const now = new Date().toISOString();
       await updateAdminOrder(order._id, {
         generatedBuildPrompt: prompt,
@@ -317,7 +400,7 @@ function OrderDetail({ order: initialOrder, onBack, onStatusChange }) {
       setOrder(prev => ({ ...prev, generatedBuildPrompt: prompt, promptGeneratedAt: now, status: 'In Progress' }));
       onStatusChange(order._id, 'In Progress');
       toast.success('Build prompt generated!');
-    } catch { toast.error('Failed to save prompt'); }
+    } catch { toast.error('Failed to generate prompt'); }
     finally { setGeneratingBuild(false); }
   };
 
