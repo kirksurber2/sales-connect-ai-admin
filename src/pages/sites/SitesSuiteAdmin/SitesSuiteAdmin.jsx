@@ -201,13 +201,14 @@ export default function SitesSuiteAdmin() {
 }
 
 // ─── BUILD PROMPT GENERATOR ───
-function generateBuildPrompt(order, branding, sitePrompt) {
+function generateBuildPrompt(order, branding, sitePrompt, promptTemplate) {
   const b = branding || {};
   const sg = b.styleGuide || {};
   const voice = b.voice || {};
   const avatar = b.customerAvatar || {};
   const sp = sitePrompt || {};
   const proof = sp.socialProof || {};
+  const pt = promptTemplate || {};
   const ec = order.ecommerce;
   const pillarObj = PILLARS.find(p => p.key === order.pillar);
 
@@ -224,6 +225,71 @@ Secondary Keywords: ${(sp.seo.secondaryKeywords || []).join(', ')}
 Local Modifiers: ${(sp.seo.localModifiers || []).join(', ')}` : '';
 
   const borderRadiusBtn = sg.buttonStyle === 'Pill' ? '50px' : '8px';
+
+  // If a matching template has a rawPrompt, inject tokens into it
+  if (pt.rawPrompt) {
+    const tokens = {
+      '[BUSINESS_NAME]': order.siteName || sp.businessName || '',
+      '[OWNER_NAME]': sp.ownerName || b.ownerPersona?.name || '',
+      '[INDUSTRY]': sp.industry || '',
+      '[PHONE]': sp.phone || '',
+      '[EMAIL]': sp.email || '',
+      '[ADDRESS]': sp.address || '',
+      '[SERVICE_AREA]': b.serviceArea || sp.serviceArea || '',
+      '[DOMAIN]': sp.domain || '',
+      '[HOURS]': sp.hours || '',
+      '[TAGLINE]': b.tagline || '',
+      '[CORE_OFFER]': b.coreOffer || '',
+      '[BRAND_VOICE]': voice.brandVoice || '',
+      '[TONE]': voice.tone || '',
+      '[WORDS_TO_AVOID]': (voice.wordsToAvoid || []).join(', '),
+      '[PREFERRED_PHRASES]': (voice.preferredPhrases || []).join(', '),
+      '[DIFFERENTIATORS]': (b.differentiators || []).join(' · '),
+      '[KEY_SELLING_POINTS]': (b.keySellingPoints || []).join(' · '),
+      '[GUARANTEES]': (b.guarantees || []).join(' · '),
+      '[CUSTOMER_AVATAR]': avatar.description || '',
+      '[PAIN_POINTS]': (avatar.painPoints || []).join(', '),
+      '[OWNER_BACKSTORY]': b.ownerPersona?.backstory || '',
+      '[PRIMARY_COLOR]': sg.primaryColor || '#1e3a5f',
+      '[SECONDARY_COLOR]': sg.secondaryColor || '#f59e0b',
+      '[ACCENT_COLOR]': sg.accentColor || '#ffffff',
+      '[FONT_HEADING]': sg.fontHeading || 'Inter',
+      '[FONT_BODY]': sg.fontBody || 'Inter',
+      '[BUTTON_STYLE]': sg.buttonStyle || 'Solid',
+      '[BUTTON_RADIUS]': borderRadiusBtn,
+      '[CARD_RADIUS]': sg.borderRadius || '16px',
+      '[LOGO_URL]': sg.logoUrl || '/logo.png',
+      '[PILLAR_LABEL]': strategy.label,
+      '[PILLAR_DIRECTION]': strategy.direction,
+      '[SERVICES_LIST]': services || '[Derive from business context]',
+      '[YEARS_IN_BUSINESS]': proof.yearsInBusiness || '',
+      '[JOBS_COMPLETED]': proof.jobsCompleted || '',
+      '[GOOGLE_RATING]': proof.googleRating || '',
+      '[CERTIFICATIONS]': proof.certifications || '',
+      '[TESTIMONIALS]': testimonials || '[Use realistic placeholders]',
+      '[WHY_CHOOSE_US]': (pt.whyChooseUs || []).filter(Boolean).map(w => `- ${w}`).join('\n'),
+      '[PRIMARY_KEYWORD]': sp.seo?.primaryKeyword || pt.seo?.primaryKeyword || '',
+      '[SECONDARY_KEYWORDS]': (sp.seo?.secondaryKeywords?.length ? sp.seo.secondaryKeywords : pt.seo?.secondaryKeywords || []).join(', '),
+      '[LOCAL_MODIFIERS]': (sp.seo?.localModifiers?.length ? sp.seo.localModifiers : pt.seo?.localModifiers || []).join(', '),
+      '[PAGES_LIST]': order.selectedPages?.length ? order.selectedPages.map(p => `- ${p}`).join('\n') : '- Home, About, Services, Contact',
+      '[ECOMMERCE_BLOCK]': ec ? `Categories: ${(ec.categories || []).join(', ')}\nPayment Processor: ${ec.paymentProcessor || ''}\nSize Variants: ${ec.sizeVariants ? 'Yes' : 'No'}\nEstimated Products: ${ec.estimatedProducts || ''}${ec.notes ? `\nNotes: ${ec.notes}` : ''}` : 'Not required',
+      '[ECOMMERCE_CATEGORIES]': (ec?.categories || []).join(', '),
+      '[PAYMENT_PROCESSOR]': ec?.paymentProcessor || '',
+      '[SIZE_VARIANTS]': ec?.sizeVariants ? 'Yes' : 'No',
+      '[REFERENCE_LINKS]': order.referenceLinks || '',
+      '[CLIENT_NOTES]': order.description || '',
+      '[SCA_WIDGET]': 'Yes',
+      '[GA_ID]': sp.tracking?.gaId || 'PLACEHOLDER',
+      '[FB_PIXEL]': sp.tracking?.fbPixel || 'PLACEHOLDER',
+      '[GTM_ID]': sp.tracking?.gtmId || 'PLACEHOLDER',
+      '[AI_INSTRUCTIONS]': pt.aiInstructions || '',
+    };
+    let result = pt.rawPrompt;
+    for (const [token, value] of Object.entries(tokens)) {
+      if (value) result = result.replaceAll(token, value);
+    }
+    return result;
+  }
 
   const PILLAR_STRATEGY = {
     'seo': { label: 'SEO', direction: 'Structure every section for search. Keyword-rich H1, H2s as search queries, meta title + description, LocalBusiness schema.' },
@@ -386,11 +452,14 @@ function OrderDetail({ order: initialOrder, onBack, onStatusChange }) {
     setGeneratingBuild(true);
     try {
       const headers = await authHeaders();
-      const [brandingRes, sitePromptRes] = await Promise.all([
+      const [brandingRes, sitePromptRes, templatesRes] = await Promise.all([
         axios.get(`${BUSINESS_API}/business/${order.businessId}/branding`, { headers }),
         axios.get(`${BUSINESS_API}/business/${order.businessId}/site-prompt`, { headers }).catch(() => ({ data: null })),
+        axios.get(`${BASE}/prompt-templates?templateType=site&active=true`, { headers }).catch(() => ({ data: [] })),
       ]);
-      const prompt = generateBuildPrompt(order, brandingRes.data, sitePromptRes.data);
+      const templates = templatesRes.data || [];
+      const matchedTemplate = templates.find(t => t.buildType === order.buildType) || templates[0] || null;
+      const prompt = generateBuildPrompt(order, brandingRes.data, sitePromptRes.data, matchedTemplate);
       const now = new Date().toISOString();
       await updateAdminOrder(order._id, {
         generatedBuildPrompt: prompt,

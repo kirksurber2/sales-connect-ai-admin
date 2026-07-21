@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { FiPlus, FiTrash2, FiSave, FiCopy, FiLayers, FiGlobe, FiFileText } from 'react-icons/fi';
 import { api } from '../../utils/api';
-import { INDUSTRIES } from '../../utils/constants';
+import { SITE_BUILD_TYPES, PAGE_BUILD_TYPES } from '../../utils/constants';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './promptTemplates.module.css';
 
 const EMPTY_PAGE_TEMPLATE = {
   templateType: 'page',
-  name: '', industry: '', description: '', isActive: true,
+  name: '', buildType: '', description: '', isActive: true,
   services: [{ name: '', description: '', bullets: '' }],
   seo: { primaryKeyword: '', secondaryKeywords: [], localModifiers: [] },
   pages: { galleryPage: false, faqPage: false, reviewsPage: true, financingPage: false, serviceAreaPage: true },
@@ -21,7 +21,7 @@ const EMPTY_PAGE_TEMPLATE = {
 
 const EMPTY_SITE_TEMPLATE = {
   templateType: 'site',
-  name: '', industry: '', description: '', isActive: true,
+  name: '', buildType: '', description: '', isActive: true,
   seo: { primaryKeyword: '', secondaryKeywords: [], localModifiers: [] },
   aiInstructions: '',
   rawPrompt: '',
@@ -84,12 +84,13 @@ export default function PromptTemplates() {
   }
 
   async function handleSave() {
-    if (!form.name || !form.industry) { toast.error('Name and industry required'); return; }
+    if (!form.name || !form.buildType) { toast.error('Name and build type required'); return; }
     setSaving(true);
     try {
       const payload = {
         ...form,
         templateType: typeTab,
+        buildType: form.buildType,
         seo: {
           primaryKeyword: form.seo.primaryKeyword,
           secondaryKeywords: (typeof form.seo.secondaryKeywords === 'string' ? form.seo.secondaryKeywords : '').split(',').map(s => s.trim()).filter(Boolean),
@@ -160,7 +161,7 @@ export default function PromptTemplates() {
         {templates.map(t => (
           <button key={t._id} className={`${styles.listItem} ${selected === t._id ? styles.active : ''}`} onClick={() => selectTemplate(t)}>
             <span className={styles.listName}>{t.name}</span>
-            <span className={styles.listIndustry}>{t.industry}</span>
+            <span className={styles.listIndustry}>{t.buildType}</span>
             <span className={`${styles.listBadge} ${t.isActive ? styles.badgeActive : styles.badgeInactive}`}>{t.isActive ? 'Active' : 'Inactive'}</span>
           </button>
         ))}
@@ -185,15 +186,15 @@ export default function PromptTemplates() {
                 <input className={styles.input} value={form.name} onChange={e => set('name', e.target.value)} placeholder={typeTab === 'page' ? 'Trades — Pro Page' : 'Trades — Full Site'} />
               </div>
               <div className={styles.field}>
-                <label className={styles.label}>Industry *</label>
-                <select className={styles.input} value={form.industry} onChange={e => set('industry', e.target.value)}>
+                <label className={styles.label}>Build Type *</label>
+                <select className={styles.input} value={form.buildType} onChange={e => set('buildType', e.target.value)}>
                   <option value="">Select...</option>
-                  {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
+                  {(typeTab === 'site' ? SITE_BUILD_TYPES : PAGE_BUILD_TYPES).map(b => <option key={b}>{b}</option>)}
                 </select>
               </div>
               <div className={`${styles.field} ${styles.full}`}>
                 <label className={styles.label}>Description</label>
-                <input className={styles.input} value={form.description} onChange={e => set('description', e.target.value)} placeholder={typeTab === 'page' ? 'Base prompt for home service trades single pages' : 'Full site build prompt for home service trades'} />
+                <input className={styles.input} value={form.description} onChange={e => set('description', e.target.value)} placeholder={typeTab === 'page' ? 'Base prompt for Pro Pages and service pages' : 'Full site build prompt for home service businesses'} />
               </div>
               <div className={styles.field}>
                 <label className={styles.checkbox}><input type="checkbox" checked={form.isActive} onChange={e => set('isActive', e.target.checked)} /> Active</label>

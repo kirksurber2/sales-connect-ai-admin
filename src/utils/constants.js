@@ -5,6 +5,25 @@ export const INDUSTRIES = [
   'Real Estate Agent', 'Consultant', 'Faceless / Top of Funnel','Ecomm','Other'
 ];
 
+export const SITE_BUILD_TYPES = [
+  'Home Services',
+  'Professional Services',
+  'Photographer / Creative',
+  'Restaurant / Food',
+  'Ecommerce',
+  'SaaS / App',
+];
+
+export const PAGE_BUILD_TYPES = [
+  'Pro Page',
+  'Landing Page',
+  'Service Page',
+  'Location Page',
+  'Blog Post',
+  'Photo Gallery',
+  'Other',
+];
+
 export const CLIENT_STATUSES = ['Active', 'Onboarding', 'Churned'];
 export const ORDER_STATUSES = ['Pending', 'In Progress', 'Review', 'Complete'];
 export const TICKET_STATUSES = ['Open', 'In Progress', 'Waiting on Client', 'Resolved'];
