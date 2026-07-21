@@ -4,12 +4,22 @@ import { FaGlobe, FaSpinner, FaCopy, FaChevronLeft, FaCheck, FaServer, FaHammer,
 import { FiRefreshCw, FiAlertTriangle, FiLink, FiVideo, FiFilter } from 'react-icons/fi';
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { PILLARS, STATUS_COLORS, STATUS_LABELS } from '../../../pages/company/sites-suite/SitesSuitePage';
 import './SitesSuiteAdmin.css';
 
 const BASE = import.meta.env.VITE_SITES_SUITE_API || import.meta.env.VITE_API_BASE;
 
 const ORDER_STATUSES = ['Pending', 'In Progress', 'Review', 'Revisions', 'Complete'];
+export const PILLARS = [
+  { key: 'seo', label: 'SEO', icon: FiSearch, desc: 'Rank and capture organic traffic' },
+  { key: 'problem-solution', label: 'Problem → Solution', icon: FiZap, desc: 'Agitate pain, present your fix' },
+  { key: 'achievement-result', label: 'Achievement & End Result', icon: FiTrendingUp, desc: 'Lead with transformation outcomes' },
+  { key: 'trust-authority', label: 'Trust & Authority', icon: FiShield, desc: 'Credentials, proof, and social trust' },
+  { key: 'frictionless', label: 'Frictionless Experience', icon: FiChevronsRight, desc: 'Speed, simplicity, remove barriers' },
+  { key: 'buyer-intent', label: 'Buyer Intent', icon: FiTarget, desc: 'Built for people ready to buy now' },
+  { key: 'photo-gallery', label: 'Photo Gallery', icon: FiImage, desc: 'Showcase work with a full image gallery' },
+];
+
+const PAGE_TYPES = ['Service Page', 'Landing Page', 'Location Page', 'Blog Post', 'Pro Page', 'Full Site', 'Other'];
 
 const ORDER_STATUS_COLORS = {
   Pending: '#f59e0b',
@@ -18,6 +28,23 @@ const ORDER_STATUS_COLORS = {
   Revisions: '#f97316',
   Complete: '#22c55e',
 };
+
+export const STATUS_LABELS = {
+  uploading: 'Uploading...',
+  transcribing: 'Transcribing video...',
+  generating: 'Generating prompt...',
+  complete: 'Complete',
+  failed: 'Failed',
+};
+
+export const STATUS_COLORS = {
+  uploading: '#0ea5e9',
+  transcribing: '#0ea5e9',
+  generating: '#7c3aed',
+  complete: '#22c55e',
+  failed: '#ef4444',
+};
+
 
 async function authHeaders() {
   const session = await fetchAuthSession();
