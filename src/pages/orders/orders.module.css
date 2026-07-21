@@ -18,14 +18,224 @@
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
 }
 
+.refreshBtn {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.refreshBtn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Filter tabs ── */
 .filters {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
 }
 
+.filterTab {
+  padding: 0.4rem 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterTab:hover { border-color: var(--accent); color: var(--accent); }
+.filterTabActive { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── Accordion list ── */
+.accordionList { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.accordionItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.accordionOpen { border-color: var(--accent); }
+
+.accordionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  gap: 1rem;
+}
+
+.accordionHeader:hover { background: var(--bg-hover); }
+
+.accordionLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.accordionRight {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.businessName {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.pageName {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.pageTag, .pillarTag, .domainTag {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.gpStatus {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.orderDate { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ── Accordion body ── */
+.accordionBody {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.metaRow {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metaItem label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metaItem span { font-size: 0.875rem; }
+
+.bodySection { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.bodySection > label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bodySection p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+
+.gapsBlock { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 0.75rem 1rem; }
+.gapsBlock > label { color: #ef4444; }
+
+.gapsList, .bulletList {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.gapsList li, .bulletList li { font-size: 0.875rem; color: var(--text-secondary); }
+
+.promptHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius-btn);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copyBtnCopied { background: #22c55e; }
+
+.promptOutput {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+.errorBlock {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+}
+
+.processingTag {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Shared form styles (used by OrderNew) ── */
 .select {
   padding: 0.6rem 0.75rem;
   background: var(--bg-card);
@@ -36,41 +246,7 @@
   outline: none;
 }
 
-.table {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  overflow: hidden;
-}
-
-.tableHeader {
-  display: grid;
-  grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr 1fr;
-  padding: 0.75rem 1rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-}
-
-.tableRow {
-  display: grid;
-  grid-template-columns: 1.5fr 2fr 1fr 0.8fr 0.8fr 1fr;
-  padding: 0.75rem 1rem;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.tableRow:hover { background: var(--bg-hover); }
-.tableRow:last-child { border-bottom: none; }
-.muted { color: var(--text-secondary); font-size: 0.85rem; }
-.empty { padding: 2rem; text-align: center; color: var(--text-muted); }
-
-.detail {
-  max-width: 800px;
-}
+.detail { max-width: 800px; }
 
 .section {
   background: var(--bg-card);
@@ -136,33 +312,108 @@
 .infoItem span { font-size: 0.9rem; }
 
 .statusSelect {
-  composes: input;
-  width: auto;
-}
-
-.kwHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-}
-
-.kwHeader .sectionTitle { margin-bottom: 0; }
-
-.kwEditBtn {
-  background: none;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-hover);
   border: 1px solid var(--border);
   border-radius: 6px;
-  color: var(--accent);
-  padding: 0.35rem 0.7rem;
+  color: var(--text-primary);
   font-size: 0.8rem;
+  outline: none;
   cursor: pointer;
 }
 
-.kwEditBtn:hover { border-color: var(--accent); }
+.empty { padding: 2rem; text-align: center; color: var(--text-muted); }
 
-.kwHint {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
+/* Pillar selector */
+.pillarGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
 }
+
+.pillarBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.pillarBtn strong { font-size: 0.85rem; }
+.pillarBtn span { font-size: 0.75rem; color: var(--text-muted); }
+.pillarBtn:hover { border-color: var(--accent); }
+.pillarBtnActive { border-color: var(--accent); background: rgba(99,102,241,0.08); }
+
+/* Image upload */
+.imageUploadZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1.5rem;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  font-size: 0.875rem;
+}
+
+.imageUploadZone:hover { border-color: var(--accent); color: var(--accent); }
+.imageUploadHint { font-size: 0.75rem; }
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.imageThumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.imageThumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.imageThumbError { border-color: #ef4444; }
+
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+.imageOverlayError { background: rgba(239,68,68,0.65); }
+
+.imageRemove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.imageRemove:hover { background: #ef4444; }
