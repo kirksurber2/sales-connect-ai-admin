@@ -28,6 +28,36 @@
   font-weight: 600;
 }
 
+.typeTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.typeTab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.typeTab:hover { border-color: var(--accent); color: var(--text-primary); }
+.typeTabActive { border-color: var(--accent); color: var(--accent); background: var(--bg-hover); font-weight: 600; }
+
+.typeHint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
 .list {
   display: flex;
   flex-direction: column;

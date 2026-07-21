@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { FiPlus, FiTrash2, FiSave, FiCopy, FiEdit2, FiLayers } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiSave, FiCopy, FiLayers, FiGlobe, FiFileText } from 'react-icons/fi';
 import { api } from '../../utils/api';
 import { INDUSTRIES } from '../../utils/constants';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './promptTemplates.module.css';
 
-const EMPTY_TEMPLATE = {
+const EMPTY_PAGE_TEMPLATE = {
+  templateType: 'page',
   name: '', industry: '', description: '', isActive: true,
   services: [{ name: '', description: '', bullets: '' }],
   seo: { primaryKeyword: '', secondaryKeywords: [], localModifiers: [] },
@@ -18,19 +19,30 @@ const EMPTY_TEMPLATE = {
   rawPrompt: '',
 };
 
+const EMPTY_SITE_TEMPLATE = {
+  templateType: 'site',
+  name: '', industry: '', description: '', isActive: true,
+  seo: { primaryKeyword: '', secondaryKeywords: [], localModifiers: [] },
+  aiInstructions: '',
+  rawPrompt: '',
+};
+
 export default function PromptTemplates() {
+  const [typeTab, setTypeTab] = useState('page'); // 'page' | 'site'
   const [templates, setTemplates] = useState([]);
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState('prompt');
 
-  useEffect(() => { loadTemplates(); }, []);
+  useEffect(() => { loadTemplates(); }, [typeTab]);
 
   async function loadTemplates() {
+    setLoading(true);
+    setSelected(null);
+    setForm(null);
     try {
-      const data = await api.get('/prompt-templates');
+      const data = await api.get(`/prompt-templates?templateType=${typeTab}`);
       setTemplates(data);
     } catch {} finally { setLoading(false); }
   }
@@ -39,13 +51,18 @@ export default function PromptTemplates() {
     setSelected(tpl._id);
     setForm({
       ...tpl,
-      seo: { ...tpl.seo, secondaryKeywords: (tpl.seo?.secondaryKeywords || []).join(', '), localModifiers: (tpl.seo?.localModifiers || []).join(', '), primaryKeyword: tpl.seo?.primaryKeyword || '' },
+      seo: {
+        ...tpl.seo,
+        secondaryKeywords: (tpl.seo?.secondaryKeywords || []).join(', '),
+        localModifiers: (tpl.seo?.localModifiers || []).join(', '),
+        primaryKeyword: tpl.seo?.primaryKeyword || '',
+      },
     });
   }
 
   function startNew() {
     setSelected('new');
-    setForm({ ...EMPTY_TEMPLATE });
+    setForm(typeTab === 'site' ? { ...EMPTY_SITE_TEMPLATE } : { ...EMPTY_PAGE_TEMPLATE });
   }
 
   function set(key, val) { setForm(f => ({ ...f, [key]: val })); }
@@ -72,6 +89,7 @@ export default function PromptTemplates() {
     try {
       const payload = {
         ...form,
+        templateType: typeTab,
         seo: {
           primaryKeyword: form.seo.primaryKeyword,
           secondaryKeywords: (typeof form.seo.secondaryKeywords === 'string' ? form.seo.secondaryKeywords : '').split(',').map(s => s.trim()).filter(Boolean),
@@ -101,9 +119,8 @@ export default function PromptTemplates() {
   }
 
   function handleDuplicate() {
-    const dup = { ...form, name: form.name + ' (Copy)', _id: undefined };
     setSelected('new');
-    setForm(dup);
+    setForm({ ...form, name: form.name + ' (Copy)', _id: undefined });
     toast.info('Editing duplicate — save to create');
   }
 
@@ -116,7 +133,29 @@ export default function PromptTemplates() {
         <button className={styles.newBtn} onClick={startNew}><FiPlus size={14} /> New Template</button>
       </div>
 
-      {/* Template List */}
+      {/* Type tabs */}
+      <div className={styles.typeTabs}>
+        <button
+          className={`${styles.typeTab} ${typeTab === 'page' ? styles.typeTabActive : ''}`}
+          onClick={() => setTypeTab('page')}
+        >
+          <FiFileText size={14} /> Web Page Templates
+        </button>
+        <button
+          className={`${styles.typeTab} ${typeTab === 'site' ? styles.typeTabActive : ''}`}
+          onClick={() => setTypeTab('site')}
+        >
+          <FiGlobe size={14} /> Website Templates
+        </button>
+      </div>
+
+      <p className={styles.typeHint}>
+        {typeTab === 'page'
+          ? 'Base prompts for building individual pages (VideoToPage, Pro Pages, Landing Pages). Business branding and voice are injected at build time.'
+          : 'Base prompts for building full Next.js websites (site-build orders). Business branding, services, and order details are injected at build time.'}
+      </p>
+
+      {/* Template list */}
       <div className={styles.list}>
         {templates.map(t => (
           <button key={t._id} className={`${styles.listItem} ${selected === t._id ? styles.active : ''}`} onClick={() => selectTemplate(t)}>
@@ -125,7 +164,7 @@ export default function PromptTemplates() {
             <span className={`${styles.listBadge} ${t.isActive ? styles.badgeActive : styles.badgeInactive}`}>{t.isActive ? 'Active' : 'Inactive'}</span>
           </button>
         ))}
-        {templates.length === 0 && <p className={styles.muted}>No templates yet. Create your first one.</p>}
+        {templates.length === 0 && <p className={styles.muted}>No {typeTab === 'page' ? 'page' : 'website'} templates yet. Create your first one.</p>}
       </div>
 
       {/* Editor */}
@@ -137,19 +176,13 @@ export default function PromptTemplates() {
             {selected !== 'new' && <button className={`${styles.actionBtn} ${styles.danger}`} onClick={handleDelete}><FiTrash2 size={14} /> Delete</button>}
           </div>
 
-          {/* Tabs */}
-          <div className={styles.tabs}>
-            <button className={`${styles.tab} ${tab === 'prompt' ? styles.tabActive : ''}`} onClick={() => setTab('prompt')}>Raw Prompt</button>
-            <button className={`${styles.tab} ${tab === 'settings' ? styles.tabActive : ''}`} onClick={() => setTab('settings')}>Structured Settings</button>
-          </div>
-
-          {/* Basic Info */}
+          {/* Basic info */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Template Info</h3>
             <div className={styles.grid}>
               <div className={styles.field}>
                 <label className={styles.label}>Template Name *</label>
-                <input className={styles.input} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Trades — Pro Page" />
+                <input className={styles.input} value={form.name} onChange={e => set('name', e.target.value)} placeholder={typeTab === 'page' ? 'Trades — Pro Page' : 'Trades — Full Site'} />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Industry *</label>
@@ -160,7 +193,7 @@ export default function PromptTemplates() {
               </div>
               <div className={`${styles.field} ${styles.full}`}>
                 <label className={styles.label}>Description</label>
-                <input className={styles.input} value={form.description} onChange={e => set('description', e.target.value)} placeholder="Base prompt for home service trades (roofing, HVAC, plumbing, etc.)" />
+                <input className={styles.input} value={form.description} onChange={e => set('description', e.target.value)} placeholder={typeTab === 'page' ? 'Base prompt for home service trades single pages' : 'Full site build prompt for home service trades'} />
               </div>
               <div className={styles.field}>
                 <label className={styles.checkbox}><input type="checkbox" checked={form.isActive} onChange={e => set('isActive', e.target.checked)} /> Active</label>
@@ -168,29 +201,25 @@ export default function PromptTemplates() {
             </div>
           </div>
 
-          {/* Raw Prompt Tab */}
-          {tab === 'prompt' && (
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Full Industry Prompt</h3>
-              <p className={styles.hint}>Paste your complete base prompt here. In Site Builder, client data will be merged with this prompt. Use placeholders like [Business Name], [Phone], [Service Area], [Primary Keyword] etc. that get replaced with client data.</p>
-              <textarea className={styles.rawPrompt} value={form.rawPrompt || ''} onChange={e => set('rawPrompt', e.target.value)} placeholder="# Client Site Build Prompt
+          {/* Raw prompt — primary for both types */}
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>Raw Prompt</h3>
+            <p className={styles.hint}>
+              {typeTab === 'page'
+                ? 'The base page-building prompt for this industry. At build time, business branding (colors, fonts, voice, avatar) and page-specific data (transcript brief, pillar strategy, services, SEO) are injected automatically.'
+                : 'The base site-building prompt for this industry. At build time, business branding, services, social proof, order details (pages, pillar, ecommerce), and SEO are injected automatically.'}
+            </p>
+            <textarea className={styles.rawPrompt} value={form.rawPrompt || ''} onChange={e => set('rawPrompt', e.target.value)} placeholder={typeTab === 'page'
+              ? 'You are an expert Next.js developer. Build ONE single page...\n\n## PAGE\nTitle: [PAGE_TITLE]\nStrategy: [PILLAR_STRATEGY]\n\n## BUSINESS\nName: [BUSINESS_NAME]\n...'
+              : 'You are an expert Next.js developer. Build a complete Next.js site...\n\n## BUSINESS\nName: [BUSINESS_NAME]\nIndustry: [INDUSTRY]\n\n## BRAND\nTagline: [TAGLINE]\n...'
+            } />
+            <div className={styles.charCount}>{(form.rawPrompt || '').length} characters</div>
+          </div>
 
-Build this complete Next.js project...
-
-## CLIENT INFORMATION
-Business Name: [Business Name]
-..." />
-              <div className={styles.charCount}>{(form.rawPrompt || '').length} characters</div>
-            </div>
-          )}
-
-          {/* Structured Settings Tab */}
-          {tab === 'settings' && (
-            <>
-
-          {/* SEO Defaults */}
+          {/* SEO defaults — both types */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Default SEO Strategy</h3>
+            <p className={styles.hint}>Industry-level SEO defaults. Overridden by the client's own sitePrompt SEO settings at build time.</p>
             <div className={styles.grid}>
               <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Primary Keyword Pattern</label><input className={styles.input} value={form.seo.primaryKeyword} onChange={e => setNested('seo', 'primaryKeyword', e.target.value)} placeholder="[service] [city]" /></div>
               <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Secondary Keywords (comma-separated)</label><input className={styles.input} value={form.seo.secondaryKeywords} onChange={e => setNested('seo', 'secondaryKeywords', e.target.value)} placeholder="[service] near me, best [service] [city]" /></div>
@@ -198,70 +227,68 @@ Business Name: [Business Name]
             </div>
           </div>
 
-          {/* Services */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default Services</h3>
-            {form.services.map((s, i) => (
-              <div key={i} className={styles.serviceRow}>
-                <div className={styles.grid}>
-                  <div className={styles.field}><label className={styles.label}>Service {i + 1}</label><input className={styles.input} value={s.name} onChange={e => updateService(i, 'name', e.target.value)} placeholder="Service name" /></div>
-                  <div className={styles.field}><label className={styles.label}>Description</label><input className={styles.input} value={s.description} onChange={e => updateService(i, 'description', e.target.value)} /></div>
-                  <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Key Points</label><input className={styles.input} value={s.bullets} onChange={e => updateService(i, 'bullets', e.target.value)} placeholder="comma-separated" /></div>
-                </div>
-                {form.services.length > 1 && <button className={styles.removeBtn} onClick={() => removeService(i)}><FiTrash2 size={14} /></button>}
-              </div>
-            ))}
-            <button className={styles.addItemBtn} onClick={addService}><FiPlus size={14} /> Add Service</button>
-          </div>
-
-          {/* Why Choose Us */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default "Why Choose Us"</h3>
-            {form.whyChooseUs.map((p, i) => (
-              <input key={i} className={styles.input} style={{ marginBottom: '0.5rem', width: '100%' }} value={p} onChange={e => updateWhyChoose(i, e.target.value)} placeholder={`Point ${i + 1}`} />
-            ))}
-          </div>
-
-          {/* FAQs */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default FAQs</h3>
-            {form.faqs.map((f, i) => (
-              <div key={i} className={styles.grid} style={{ marginBottom: '0.5rem' }}>
-                <div className={styles.field}><label className={styles.label}>Q{i + 1}</label><input className={styles.input} value={f.q} onChange={e => updateFaq(i, 'q', e.target.value)} /></div>
-                <div className={styles.field}><label className={styles.label}>A{i + 1}</label><input className={styles.input} value={f.a} onChange={e => updateFaq(i, 'a', e.target.value)} /></div>
-              </div>
-            ))}
-            <button className={styles.addItemBtn} onClick={addFaq}><FiPlus size={14} /> Add FAQ</button>
-          </div>
-
-          {/* AI Instructions */}
+          {/* AI instructions — both types */}
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>AI Instructions Override</h3>
-            <p className={styles.hint}>Industry-specific instructions appended to the generated prompt (e.g., "Include before/after gallery section", "Add booking calendar integration")</p>
-            <textarea className={styles.textarea} value={form.aiInstructions} onChange={e => set('aiInstructions', e.target.value)} placeholder="Additional AI instructions specific to this industry..." rows={5} />
+            <p className={styles.hint}>Industry-specific instructions appended at build time (e.g. "Include before/after gallery section", "Add booking calendar integration").</p>
+            <textarea className={styles.textarea} value={form.aiInstructions || ''} onChange={e => set('aiInstructions', e.target.value)} placeholder="Additional AI instructions specific to this industry..." rows={4} />
           </div>
 
-          {/* Page Defaults */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default Pages</h3>
-            <div className={styles.checkboxes}>
-              <label className={styles.checkbox}><input type="checkbox" checked={form.pages.galleryPage} onChange={e => setNested('pages', 'galleryPage', e.target.checked)} /> Gallery</label>
-              <label className={styles.checkbox}><input type="checkbox" checked={form.pages.faqPage} onChange={e => setNested('pages', 'faqPage', e.target.checked)} /> FAQ</label>
-              <label className={styles.checkbox}><input type="checkbox" checked={form.pages.reviewsPage} onChange={e => setNested('pages', 'reviewsPage', e.target.checked)} /> Reviews</label>
-              <label className={styles.checkbox}><input type="checkbox" checked={form.pages.financingPage} onChange={e => setNested('pages', 'financingPage', e.target.checked)} /> Financing</label>
-              <label className={styles.checkbox}><input type="checkbox" checked={form.pages.serviceAreaPage} onChange={e => setNested('pages', 'serviceAreaPage', e.target.checked)} /> Service Area</label>
-            </div>
-          </div>
+          {/* Page-template-only fields */}
+          {typeTab === 'page' && (
+            <>
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Default Services</h3>
+                {form.services.map((s, i) => (
+                  <div key={i} className={styles.serviceRow}>
+                    <div className={styles.grid}>
+                      <div className={styles.field}><label className={styles.label}>Service {i + 1}</label><input className={styles.input} value={s.name} onChange={e => updateService(i, 'name', e.target.value)} placeholder="Service name" /></div>
+                      <div className={styles.field}><label className={styles.label}>Description</label><input className={styles.input} value={s.description} onChange={e => updateService(i, 'description', e.target.value)} /></div>
+                      <div className={`${styles.field} ${styles.full}`}><label className={styles.label}>Key Points</label><input className={styles.input} value={s.bullets} onChange={e => updateService(i, 'bullets', e.target.value)} placeholder="comma-separated" /></div>
+                    </div>
+                    {form.services.length > 1 && <button className={styles.removeBtn} onClick={() => removeService(i)}><FiTrash2 size={14} /></button>}
+                  </div>
+                ))}
+                <button className={styles.addItemBtn} onClick={addService}><FiPlus size={14} /> Add Service</button>
+              </div>
 
-          {/* Hero */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Default Hero / CTA</h3>
-            <div className={styles.grid}>
-              <div className={styles.field}><label className={styles.label}>CTA Button 1</label><input className={styles.input} value={form.hero.ctaButton1} onChange={e => setNested('hero', 'ctaButton1', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>CTA Button 2</label><input className={styles.input} value={form.hero.ctaButton2} onChange={e => setNested('hero', 'ctaButton2', e.target.value)} /></div>
-              <div className={styles.field}><label className={styles.label}>Hero Background</label><input className={styles.input} value={form.hero.heroBackground} onChange={e => setNested('hero', 'heroBackground', e.target.value)} /></div>
-            </div>
-          </div>
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Default "Why Choose Us"</h3>
+                {form.whyChooseUs.map((p, i) => (
+                  <input key={i} className={styles.input} style={{ marginBottom: '0.5rem', width: '100%' }} value={p} onChange={e => updateWhyChoose(i, e.target.value)} placeholder={`Point ${i + 1}`} />
+                ))}
+              </div>
+
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Default FAQs</h3>
+                {form.faqs.map((f, i) => (
+                  <div key={i} className={styles.grid} style={{ marginBottom: '0.5rem' }}>
+                    <div className={styles.field}><label className={styles.label}>Q{i + 1}</label><input className={styles.input} value={f.q} onChange={e => updateFaq(i, 'q', e.target.value)} /></div>
+                    <div className={styles.field}><label className={styles.label}>A{i + 1}</label><input className={styles.input} value={f.a} onChange={e => updateFaq(i, 'a', e.target.value)} /></div>
+                  </div>
+                ))}
+                <button className={styles.addItemBtn} onClick={addFaq}><FiPlus size={14} /> Add FAQ</button>
+              </div>
+
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Default Pages</h3>
+                <div className={styles.checkboxes}>
+                  <label className={styles.checkbox}><input type="checkbox" checked={form.pages.galleryPage} onChange={e => setNested('pages', 'galleryPage', e.target.checked)} /> Gallery</label>
+                  <label className={styles.checkbox}><input type="checkbox" checked={form.pages.faqPage} onChange={e => setNested('pages', 'faqPage', e.target.checked)} /> FAQ</label>
+                  <label className={styles.checkbox}><input type="checkbox" checked={form.pages.reviewsPage} onChange={e => setNested('pages', 'reviewsPage', e.target.checked)} /> Reviews</label>
+                  <label className={styles.checkbox}><input type="checkbox" checked={form.pages.financingPage} onChange={e => setNested('pages', 'financingPage', e.target.checked)} /> Financing</label>
+                  <label className={styles.checkbox}><input type="checkbox" checked={form.pages.serviceAreaPage} onChange={e => setNested('pages', 'serviceAreaPage', e.target.checked)} /> Service Area</label>
+                </div>
+              </div>
+
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Default Hero / CTA</h3>
+                <div className={styles.grid}>
+                  <div className={styles.field}><label className={styles.label}>CTA Button 1</label><input className={styles.input} value={form.hero.ctaButton1} onChange={e => setNested('hero', 'ctaButton1', e.target.value)} /></div>
+                  <div className={styles.field}><label className={styles.label}>CTA Button 2</label><input className={styles.input} value={form.hero.ctaButton2} onChange={e => setNested('hero', 'ctaButton2', e.target.value)} /></div>
+                  <div className={styles.field}><label className={styles.label}>Hero Background</label><input className={styles.input} value={form.hero.heroBackground} onChange={e => setNested('hero', 'heroBackground', e.target.value)} /></div>
+                </div>
+              </div>
             </>
           )}
         </div>
